@@ -362,7 +362,7 @@ export default function DataScreen() {
             {/* Rank tabs */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {CATEGORIES.map((c) => (
-                <NeoButton key={c} label={RANK_LABELS[c]} fontSize={14} isDark={category === c} isActive={category === c} onPressed={() => setCategory(c)} />
+                <NeoButton key={c} label={RANK_LABELS[c]} fontSize={14} isDark={category === c} onPressed={() => setCategory(c)} />
               ))}
             </div>
 
@@ -409,20 +409,18 @@ export default function DataScreen() {
               <NeoButton
                 label={order === "asc" ? "Asc" : "Desc"}
                 fontSize={14}
-                isActive={order === "asc"}
                 isDark={order === "asc"}
                 onPressed={() => setOrder(order === "asc" ? "desc" : "asc")}
               />
               <NeoButton
                 label="Filters"
                 fontSize={14}
-                isActive={showFilters}
                 isDark={showFilters}
                 onPressed={() => setShowFilters(!showFilters)}
               />
               <div style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
-                <NeoButton label="Grid" fontSize={14} isDark={view === "grid"} isActive={view === "grid"} onPressed={() => setView("grid")} />
-                <NeoButton label="List" fontSize={14} isDark={view === "list"} isActive={view === "list"} onPressed={() => setView("list")} />
+                <NeoButton label="Grid" fontSize={14} isDark={view === "grid"} onPressed={() => setView("grid")} />
+                <NeoButton label="List" fontSize={14} isDark={view === "list"}  onPressed={() => setView("list")} />
               </div>
             </div>
 

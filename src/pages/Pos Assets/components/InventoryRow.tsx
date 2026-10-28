@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import type { Item, TaxMode, TaxType } from "../types";
 import { TAX_LABEL, r2 } from "../tax";
-import { AppColors, AppPalette, AppSpacing, NeoButton, NeoChip, NeoTag } from "../../../theme/AppTheme";
+import { AppColors, AppPalette, AppSpacing, NeoButton, NeoChip } from "../../../theme/AppTheme";
 
 interface Props { item: Item; mode: TaxMode; onPatch: (p: Partial<Item>) => void; onDelete: () => void; isDark: boolean }
 

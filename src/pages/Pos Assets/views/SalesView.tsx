@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import type { Sale, Settings, Totals } from "../types";
 import { peso, r2 } from "../tax";
-import { AppColors, AppPalette, AppSpacing, NeoButton, NeoTag, WireFrame } from "../../../theme/AppTheme";
+import { AppPalette, AppSpacing, NeoButton, NeoTag, WireFrame } from "../../../theme/AppTheme";
 import { ReceiptView } from "../components/ReceiptView";
 
 interface Props { sales: Sale[]; onVoid: (s: Sale) => void; settings: Settings; isDark: boolean }

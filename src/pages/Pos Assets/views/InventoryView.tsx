@@ -1,5 +1,5 @@
-import type { Item, TaxMode, TaxType } from "../types";
-import { AppColors, AppPalette, AppSpacing, NeoButton, WireFrame } from "../../../theme/AppTheme";
+import type { Item, TaxMode } from "../types";
+import { AppPalette, AppSpacing, WireFrame } from "../../../theme/AppTheme";
 import { AddItemForm } from "../components/AddItemForm";
 import { InventoryRow } from "../components/InventoryRow";
 import type { CSSProperties } from "react";
