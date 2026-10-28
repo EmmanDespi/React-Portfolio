@@ -22,7 +22,7 @@ export function InventoryRow({ item, mode, onPatch, onDelete, isDark }: Props) {
   return (
     <div style={{
       border: `2px solid ${p.ink}`, borderRadius: 8, padding: AppSpacing.sm, color: p.ink,
-      backgroundColor: item.stock <= 0 ? `${AppColors.coral}44` : p.shell,
+      backgroundColor: item.stock <= 0 ? `${p.paper}44` : p.shell,
     }}>
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: AppSpacing.sm }}>
         <strong style={{ fontSize: 16, letterSpacing: 1,  }}>{item.name}{item.sku ? ` (${item.sku})` : ""}</strong>
@@ -43,7 +43,7 @@ export function InventoryRow({ item, mode, onPatch, onDelete, isDark }: Props) {
         {field("Add stock",
           <div style={{ display: "flex", gap: AppSpacing.sm, alignItems: "center" }}>
             <input style={input} type="number" min="1" step="1" value={add} onChange={(e) => setAdd(e.target.value)} />
-            <NeoButton label="Add" fontSize={16} isDark={isDark} color={AppColors.coral}
+            <NeoButton label="Add" fontSize={16} isDark={isDark} color={p.shell}
               onPressed={Number(add) > 0 ? () => { onPatch({ stock: item.stock + Math.floor(Number(add)) }); setAdd(""); } : undefined} />
           </div>)}
       </div>

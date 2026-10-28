@@ -39,7 +39,7 @@ export function AddItemForm({ onAdd, mode, isDark }: Props) {
   );
 
   return (
-    <WireFrame color={p.card} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>
+    <WireFrame color={p.subcard} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>
       <h2 style={heading}>Add item</h2>
       <div style={{ display: "grid", gap: AppSpacing.sm, gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))" }}>
         {field("Name", <input style={input} value={name} onChange={(e) => setName(e.target.value)} />)}
@@ -58,7 +58,7 @@ export function AddItemForm({ onAdd, mode, isDark }: Props) {
         </p>
       )}
       <div style={{ marginTop: AppSpacing.sm }}>
-        <NeoButton label="Add item" fontSize={14} isDark={isDark} color={AppColors.coral} onPressed={submit} style={{ display: "inline-block" }} />
+        <NeoButton label="Add item" fontSize={14} isDark={isDark} color={p.shell} onPressed={submit} style={{ display: "inline-block" }} />
       </div>
     </WireFrame>
   );

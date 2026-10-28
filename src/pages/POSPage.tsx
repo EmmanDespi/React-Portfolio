@@ -194,7 +194,7 @@ export default function POSPage() {
       )}
 
       <WireFrame
-        color={p.shell}
+        color={p.card}
         isDark={isDark}
         width={shellWidth}
         height="auto"
@@ -210,13 +210,13 @@ export default function POSPage() {
               {s.settings.taxMode === "VAT" ? "VAT-registered" : "Non-VAT"} • saved on this device
             </div>
           </div>
-          {/* <NeoSwitch value={isDark} onValueChange={setIsDark} /> */}
+          <NeoSwitch value={isDark} onValueChange={setIsDark} />
         </div>
 
         <div style={{ height: AppSpacing.md }} />
         <nav aria-label="POS sections" style={{ display: "flex", flexWrap: "wrap", gap: AppSpacing.sm, paddingLeft: 8, paddingBottom: AppSpacing.md }}>
           {TABS.map(([k, label]) => (
-            <NeoButton key={k} label={label} labelColor={p.shadow} fontSize={14} isDark={isDark} color={tab === k? AppColors.coral : ""} onPressed={() => setTab(k)} />
+            <NeoButton key={k} label={label} fontSize={16} isDark={isDark} color={tab === k? p.shell : ""} onPressed={() => setTab(k)} />
           ))}
         </nav>
 

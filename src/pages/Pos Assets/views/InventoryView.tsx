@@ -26,7 +26,7 @@ export function InventoryView({ items, mode, isDark, onAdd, onPatch, onDelete, s
   return (
     <div style={{ display: "grid", gap: AppSpacing.md }}>
       <AddItemForm onAdd={onAdd} mode={mode} isDark={isDark} />
-      <WireFrame color={p.card} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>
+      <WireFrame color={p.subcard} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>
         <h2 style={{ color: p.ink, fontSize: 20, fontWeight: 900, letterSpacing: 2.5, margin: `0 0 ${AppSpacing.sm}px` }}>Stock ({items.length})</h2>
         {items.length === 0 && <p style={{ color: p.ink, fontSize: 15, margin: 0 }}>Nothing here yet. Add an item above to start selling.</p>}
         <div style={{ position: "relative", marginBottom: AppSpacing.sm }}>

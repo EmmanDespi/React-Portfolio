@@ -6,7 +6,7 @@ import React, { useEffect, useState, type ReactNode } from "react";
 
 export const AppColors = {
   ink: "#171713",
-  paper: "rgb(231, 225, 205)",
+  paper: "rgb(243, 239, 226)",
   white: "#FFFEFA",
   lime: "#D7F34A",
   mustard: "#FFBF00",
@@ -17,7 +17,7 @@ export const AppColors = {
   oatcream: "#C2A178",
   dsBlue: "rgb(56, 81, 90)",
   deep:  "#0e1012",
-  oatmilk: "rgb(212, 201, 181)",
+  oatmilk: "rgb(226, 218, 203)",
   onyx: "rgb(56, 52, 59)",
   stone: "rgb(78, 74, 82)",
 } as const;
@@ -36,11 +36,11 @@ export const AppSpacing = {
 
 export const AppPalette = {
   light: {
-    background: AppColors.oatmilk,
+    background: AppColors.paper,
     title: AppColors.deep,
-    shell: AppColors.oatmilk,
-    card: AppColors.paper,
-    subcard: AppColors.mustard,
+    shell: AppColors.paper,
+    card: AppColors.white,
+    subcard: AppColors.oatmilk,
     paper: AppColors.lime,
     chip: AppColors.oatmilk,
     ink: AppColors.ink,
@@ -53,10 +53,10 @@ export const AppPalette = {
     title: AppColors.coral,
     shell: AppColors.onyx,
     card: AppColors.stone,
-    subcard: AppColors.lime,
+    subcard: AppColors.onyx,
     paper: AppColors.mustard,
     chip: AppColors.dsBlue,
-    ink: AppColors.ink,
+    ink: AppColors.paper,
     shadow: AppColors.ink,
     buttonShadow: AppColors.ink,
     inActive: AppColors.stone
@@ -282,11 +282,8 @@ export const NeoAvatar: React.FC<NeoAvatarProps> = ({
 };
 
 interface NeoButtonProps {
-  /** Text label. Rendered uppercase and centered. Optional when `children` is given. */
   label?: string;
-  /** Custom content. When provided it replaces the label. */
   children?: React.ReactNode;
-  /** Alignment of `children`. Label-only buttons are always centered. */
   align?: "left" | "center";
   labelColor?: string;
   onPressed?: () => void;
@@ -311,7 +308,7 @@ export const NeoButton: React.FC<NeoButtonProps> = ({
   shadowOffset = 4,
   width,
   height,
-  fontSize = 16,
+  fontSize = 18,
   isDark = true,
   style,
 }) => {
@@ -388,7 +385,7 @@ export const NeoButton: React.FC<NeoButtonProps> = ({
             style={{
               color: labelColor || fg,
               fontSize,
-              fontWeight: "bold",
+              fontWeight: 900,
               letterSpacing: 1.5,
               marginLeft: icon ? fontSize * 0.5 : 0,
               textTransform: "uppercase",
@@ -477,7 +474,7 @@ export const NeoChip: React.FC<NeoChipProps> = ({
   label,
   active = false,
   onPressed,
-  activeColor = AppColors.mustard,
+  activeColor = AppColors.paper,
   fontSize = 14,
   isDark = false,
   style,
@@ -638,11 +635,11 @@ export function NeoRows({
             justifyContent: "space-between",
             gap: 12,
             padding: "4px 0",
-            color: p.shadow,
-            fontSize: 15,
+            color: p.ink,
+            fontSize: 16,
           }}
         >
-          <span style={{ fontWeight: 600, opacity: 0.8 }}>{label}</span>
+          <span style={{ fontWeight: 600, opacity: 0.9 }}>{label}</span>
           <span style={{ fontWeight: 700, textAlign: "right" }}>{value}</span>
         </div>
       ))}

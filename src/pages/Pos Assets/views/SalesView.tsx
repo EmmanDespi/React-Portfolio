@@ -17,7 +17,7 @@ export function SalesView({ sales, onVoid, settings, isDark }: Props) {
 
   const heading: CSSProperties = { color: p.ink, fontSize: 20, fontWeight: 900, letterSpacing: 2.5, margin: `0 0 ${AppSpacing.sm}px` };
   const card = (children: ReactNode, key?: string) => (
-    <WireFrame key={key} color={p.card} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>{children}</WireFrame>
+    <WireFrame key={key} color={p.subcard} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>{children}</WireFrame>
   );
   const stat = (label: string, value: string) =>
     card(<>
@@ -56,7 +56,7 @@ export function SalesView({ sales, onVoid, settings, isDark }: Props) {
             </div>
             {x.voided && <p style={{ color: p.ink, fontSize: 13, margin: `${AppSpacing.xs}px 0 0` }}>Voided: {x.voidReason}</p>}
             <div style={{ display: "flex", flexWrap: "wrap", gap: AppSpacing.sm, marginTop: AppSpacing.sm }}>
-              <NeoButton label={open === x.id ? "Hide invoice" : "View invoice"} fontSize={14} isDark={isDark} color={AppColors.coral} onPressed={() => setOpen(open === x.id ? null : x.id)} />
+              <NeoButton label={open === x.id ? "Hide invoice" : "View invoice"} fontSize={14} isDark={isDark} color={p.shell} onPressed={() => setOpen(open === x.id ? null : x.id)} />
               {!x.voided && x.zNo === undefined && (
                 <NeoButton label="Void" fontSize={14} isDark={isDark} icon={<span aria-hidden>✖</span>} onPressed={() => onVoid(x)} />
               )}

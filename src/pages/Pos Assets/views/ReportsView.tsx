@@ -32,7 +32,7 @@ export function ReportsView({ store: s, onReading, onSendOutbox, notice, isDark 
   const body: CSSProperties = { color: p.ink, fontSize: 15, margin: 0 };
   const wrap: CSSProperties = { display: "flex", flexWrap: "wrap", gap: AppSpacing.sm, alignItems: "center" };
   const card = (children: ReactNode) => (
-    <WireFrame color={p.card} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>{children}</WireFrame>
+    <WireFrame color={p.subcard} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>{children}</WireFrame>
   );
   const alert = (text: string, tone: "warn" | "info") => (
     <p role={tone === "warn" ? "alert" : "status"} style={{
@@ -52,15 +52,15 @@ export function ReportsView({ store: s, onReading, onSendOutbox, notice, isDark 
           </p>
           {needsSetup && alert("Add your business name and TIN in Settings first.", "warn")}
           <div style={{ ...wrap, marginTop: AppSpacing.sm }}>
-            <NeoButton label="X-reading" fontSize={14} isDark={isDark} color={AppColors.coral} onPressed={needsSetup ? undefined : () => setSelId(onReading("X").id)} />
-            <NeoButton label="Close day (Z-reading)" fontSize={14} isDark={isDark} color={AppColors.coral} onPressed={needsSetup ? undefined : closeDay} />
+            <NeoButton label="X-reading" fontSize={14} isDark={isDark} color={p.shell} onPressed={needsSetup ? undefined : () => setSelId(onReading("X").id)} />
+            <NeoButton label="Close day (Z-reading)" fontSize={14} isDark={isDark} color={p.shell} onPressed={needsSetup ? undefined : closeDay} />
           </div>
           <p style={{ ...body, marginTop: AppSpacing.sm }}>Open invoices not yet closed: <strong>{unclosed}</strong></p>
         </>)}
 
         {shown ? (
-          <WireFrame color={AppColors.white} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>
-            <pre style={{ margin: 0, whiteSpace: "pre-wrap", overflowX: "auto", color: AppColors.ink, fontSize: 13, fontFamily: 'ui-monospace, Menlo, Consolas, "Courier New", monospace' }}>
+          <WireFrame color={p.card} isDark={isDark} height="auto" width="12" margin={0} padding={AppSpacing.sm} borderRadius={8}>
+            <pre style={{ margin: 0, whiteSpace: "pre-wrap", overflowX: "auto", color: p.ink, fontSize: 16, fontWeight: 500, fontFamily: 'ui-monospace, Menlo, Consolas, "Courier New", monospace' }}>
               {readingText(shown, s.settings)}
             </pre>
           </WireFrame>
@@ -91,9 +91,9 @@ export function ReportsView({ store: s, onReading, onSendOutbox, notice, isDark 
         {card(<>
           <h2 style={heading}>Exports</h2>
           <div style={wrap}>
-            <NeoButton label="E-journal (.txt)" fontSize={14} isDark={isDark} color={AppColors.coral} onPressed={needsSetup ? undefined : () => download(`e-journal-${stamp}.txt`, buildEJournal(s))} />
-            <NeoButton label="Sales book (.csv)" fontSize={14} isDark={isDark} color={AppColors.coral} onPressed={() => download(`sales-book-${stamp}.csv`, salesBookCsv(s.sales), "text/csv")} />
-            <NeoButton label="Backup (.json)" fontSize={14} isDark={isDark} color={AppColors.coral} onPressed={() => download(`pos-backup-${stamp}.json`, JSON.stringify(s, null, 2), "application/json")} />
+            <NeoButton label="E-journal (.txt)" fontSize={14} isDark={isDark} color={p.shell} onPressed={needsSetup ? undefined : () => download(`e-journal-${stamp}.txt`, buildEJournal(s))} />
+            <NeoButton label="Sales book (.csv)" fontSize={14} isDark={isDark} color={p.shell} onPressed={() => download(`sales-book-${stamp}.csv`, salesBookCsv(s.sales), "text/csv")} />
+            <NeoButton label="Backup (.json)" fontSize={14} isDark={isDark} color={p.shell} onPressed={() => download(`pos-backup-${stamp}.json`, JSON.stringify(s, null, 2), "application/json")} />
           </div>
         </>)}
 
