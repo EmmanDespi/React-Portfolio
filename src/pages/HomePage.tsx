@@ -9,6 +9,7 @@ import {
   NeoSwitch,
   useResponsive,
   WireFrame,
+  WireFrameFrosted,
 } from "../theme/AppTheme";
 import { FloatingButton } from "../theme/FloatingButton";
 import { useAppTheme } from "../theme/ThemeContext";
@@ -134,7 +135,7 @@ export default function HomeScreen() {
   const { isDark, setIsDark } = useAppTheme();
 
   const responsive = useResponsive();
-  const { isMobile, isDesktop, isLargeDesktop, dashboardWidth } = responsive;
+  const { isMobile, isLargeDesktop, dashboardWidth } = responsive;
   const p = isDark ? AppPalette.dark : AppPalette.light;
 
   const ink = isDark ? AppColors.oatmilk : p.ink;
@@ -353,6 +354,7 @@ export default function HomeScreen() {
       style={{
         minHeight: "100vh",
         width: "100%",
+        ...dotBackground(p.background, isDark ? "#ffffff30" : "#00000030"),
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
@@ -390,14 +392,7 @@ export default function HomeScreen() {
             </div>
         </div>
       )}
-      <WireFrame
-        color={p.shell}
-        isDark={isDark}
-        width={dashboardWidth}
-        height="auto"
-        margin={isDesktop ? AppSpacing.md : AppSpacing.sm}
-        padding={AppSpacing.sm}
-      >
+      <WireFrameFrosted width={dashboardWidth} isDark={isDark} frost={0.05}>
         {header}
         <div style={{ height: 24 }} />
         {sectionDivider("About")}
@@ -450,7 +445,18 @@ export default function HomeScreen() {
             </WireFrame>
           )}
         </div>
-      </WireFrame>
+      </WireFrameFrosted>
     </div>
   );
 }
+
+export const dotBackground = (
+  bg: string,
+  dot: string,
+  gap = 26,
+  size = 2
+): CSSProperties => ({
+  backgroundColor: bg,
+  backgroundImage: `radial-gradient(${dot} ${size}px, transparent ${size}px)`,
+  backgroundSize: `${gap}px ${gap}px`,
+});

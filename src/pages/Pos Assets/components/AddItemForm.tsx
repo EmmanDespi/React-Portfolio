@@ -53,7 +53,7 @@ export function AddItemForm({ onAdd, mode, isDark }: Props) {
           </select>)}
       </div>
       {err && (
-        <p role="alert" style={{ margin: `${AppSpacing.sm}px 0`, padding: "8px 12px", border: `2px solid ${AppColors.ink}`, borderRadius: 8, backgroundColor: AppColors.coral, color: AppColors.ink, fontWeight: 700, fontSize: 14 }}>
+        <p role="alert" style={{ margin: `${AppSpacing.sm}px 0`, padding: "8px 12px", border: `2px solid ${AppColors.ink}`, borderRadius: 8, backgroundColor: AppColors.coral, color: AppColors.white, fontWeight: 700, fontSize: 14 }}>
           {err}
         </p>
       )}

@@ -13,3 +13,7 @@ body,
 *::after {
   box-sizing: border-box;
 }
+input::placeholder {
+  color: #e4e1d9;
+  opacity: 1;    
+}

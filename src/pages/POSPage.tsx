@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import { EMPTY } from "./Pos Assets/types";
 import type { Item, Line, Reading, Sale, Settings, Store, TaxType } from "./Pos Assets/types";
@@ -12,7 +12,7 @@ import { SalesView } from "./Pos Assets/views/SalesView";
 import { ReportsView } from "./Pos Assets/views/ReportsView";
 import { SettingsView } from "./Pos Assets/views/SettingsView";
 import { FloatingButton } from "../theme/FloatingButton";
-import { AppColors, AppPalette, AppSpacing, NeoButton, NeoSwitch, WireFrame, useResponsive } from "../theme/AppTheme";
+import { AppColors, AppPalette, AppSpacing, NeoButton, WireFrameFrosted, useResponsive } from "../theme/AppTheme";
 import { useAppTheme } from "../theme/ThemeContext";
 
 type Tab = "sell" | "inventory" | "sales" | "reports" | "settings";
@@ -30,7 +30,7 @@ export default function POSPage() {
   const [lastId, setLastId] = useState<string | null>(null);
 
   // Same dark-mode setup as HomePage: start from the system scheme, toggle with NeoSwitch.
-  const { isDark, setIsDark } = useAppTheme();
+  const { isDark } = useAppTheme();
   const responsive = useResponsive();
   const p = isDark ? AppPalette.dark : AppPalette.light;
   const shellWidth = responsive.isLargeDesktop ? responsive.width * 0.7 : responsive.dashboardWidth;
@@ -161,12 +161,12 @@ export default function POSPage() {
   return (
     <div
       style={{
-        color: AppColors.oatmilk,
         minHeight: "100vh",
+        ...dotBackground(p.background, isDark ? "#ffffff30" : "#00000030"),
         width: "100%",
         boxSizing: "border-box",
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "column",  
         alignItems: "center",
         paddingTop: 42,
         paddingBottom: 80,
@@ -194,14 +194,7 @@ export default function POSPage() {
         </div>
       )}
 
-      <WireFrame
-        color={p.card}
-        isDark={isDark}
-        width={shellWidth}
-        height="auto"
-        margin={responsive.isDesktop ? AppSpacing.md : AppSpacing.sm}
-        padding={AppSpacing.sm}
-      >
+      <WireFrameFrosted width={shellWidth} isDark={isDark} frost={0.05}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: AppSpacing.sm, padding: `${AppSpacing.xs}px 8px 0` }}>
           <div style={{ minWidth: 0 }}>
             <h1 style={{ color: p.ink, fontSize: 22, fontWeight: 900, letterSpacing: 2.5, margin: 0 }}>
@@ -253,7 +246,17 @@ export default function POSPage() {
               }} />
           )}
         </div>
-      </WireFrame>
+      </WireFrameFrosted>
     </div>
   );
 }
+export const dotBackground = (
+  bg: string,
+  dot: string,
+  gap = 26,
+  size = 2
+): CSSProperties => ({
+  backgroundColor: bg,
+  backgroundImage: `radial-gradient(${dot} ${size}px, transparent ${size}px)`,
+  backgroundSize: `${gap}px ${gap}px`,
+});

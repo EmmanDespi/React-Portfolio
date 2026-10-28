@@ -6,7 +6,7 @@ import React, { useEffect, useState, type ReactNode } from "react";
 
 export const AppColors = {
   ink: "#171713",
-  paper: "rgb(243, 239, 226)",
+  paper: "#F3EFE2",
   white: "#FFFEFA",
   lime: "#D7F34A",
   mustard: "#FFBF00",
@@ -15,11 +15,11 @@ export const AppColors = {
   muted: "#77766F",
   line: "#BCB9AE",
   oatcream: "#C2A178",
-  dsBlue: "rgb(56, 81, 90)",
-  deep:  "#0e1012",
-  oatmilk: "rgb(226, 218, 203)",
-  onyx: "rgb(56, 52, 59)",
-  stone: "rgb(78, 74, 82)",
+  dsBlue: "#38515A",
+  deep: "#0E1012",
+  oatmilk: "#E2DACB",
+  onyx: "#57505C",
+  stone: "#4E4A52",
 } as const;
 
 export const AppSpacing = {
@@ -48,10 +48,10 @@ export const AppPalette = {
     buttonShadow: AppColors.ink,
     inActive: AppColors.stone
   },
-  dark: {
+  dark: { 
     background: AppColors.deep,
     title: AppColors.coral,
-    shell: AppColors.onyx,
+    shell: AppColors.dsBlue,
     card: AppColors.stone,
     subcard: AppColors.onyx,
     paper: AppColors.mustard,
@@ -222,6 +222,79 @@ export const WireFrame: React.FC<WireFrameProps> = ({
           minHeight,
           padding,
           backgroundColor: color || p.card,
+          borderRadius,
+          border: `${borderWidth}px solid ${borderColor}`,
+          boxSizing: "border-box",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
+
+interface WireFrameFrostedProps {
+  children: React.ReactNode;
+  width?: number | string;
+  height?: number | string;
+  minHeight?: number;
+  padding?: number;
+  margin?: number;
+  color?: string;          // hex like "#ffffff" (6 digits). Falls back to the palette card color
+  borderRadius?: number;
+  borderWidth?: number;
+  borderColor?: string;
+  isDark?: boolean;
+  frost?: number;          // 0 = clear glass, 1 = heavy frost (default 0.5)
+  blur?: number;           // optional px override for the blur amount
+  style?: React.CSSProperties;
+}
+
+/** Turns "#rrggbb" or "#rgb" into "rgba(r, g, b, a)". Other formats are returned as-is. */
+const withAlpha = (color: string, alpha: number): string => {
+  const m = color.trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (!m) return color;
+  let hex = m[1];
+  if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
+  const n = parseInt(hex, 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+};
+
+export const WireFrameFrosted: React.FC<WireFrameFrostedProps> = ({
+  children,
+  width = "100%",
+  height = "100%",
+  minHeight,
+  padding = 6,
+  margin = 4,
+  borderRadius = 6,
+  borderWidth = 2,
+  color,
+  borderColor = AppColors.ink,
+  isDark = true,
+  frost = 0.5,
+  blur,
+  style,
+}) => {
+  const p = isDark ? AppPalette.dark : AppPalette.light;
+
+  const f = Math.max(0, Math.min(1, frost));
+  const blurPx = blur ?? f * 20;          // 0 to 20px
+  const alpha = 0.15 + f * 0.6;           // 0.15 to 0.75
+  const filter = `blur(${blurPx}px) saturate(150%)`;
+
+  return (
+    <div style={{ position: "relative", width, minHeight, margin, ...style }}>
+      <div
+        style={{
+          position: "relative",
+          width,
+          height,
+          minHeight,
+          padding,
+          backgroundColor: withAlpha(color || p.card, alpha),
+          backdropFilter: filter,
+          WebkitBackdropFilter: filter, // Safari
           borderRadius,
           border: `${borderWidth}px solid ${borderColor}`,
           boxSizing: "border-box",
@@ -659,19 +732,20 @@ interface NeoDialogProps {
   backLabel?: string;
   isDark?: boolean;
   ariaLabel?: string;
+  frost?: number;
 }
 
 export const NeoDialog: React.FC<NeoDialogProps> = ({
   children,
   onClose,
   onBack,
+  frost = 0.1,
   maxWidth = 560,
   closeLabel = "Close",
   backLabel = "Back",
   isDark = false,
   ariaLabel = "Dialog",
 }) => {
-  const p = isDark ? AppPalette.dark : AppPalette.light;
   const responsive = useResponsive();
 
   useEffect(() => {
@@ -707,7 +781,7 @@ export const NeoDialog: React.FC<NeoDialogProps> = ({
         onClick={(e) => e.stopPropagation()}
         style={{ width: responsive.dialogWidth(maxWidth), maxWidth: "100%" }}
       >
-        <WireFrame color={p.card} padding={0} margin={0}>
+        <WireFrameFrosted  isDark={isDark} frost={frost}>
           <div style={{ maxHeight: "85vh", overflowY: "auto", padding: AppSpacing.md, borderRadius: 12 }}>
             {onBack && (
               <div style={{ marginBottom: AppSpacing.sm }}>
@@ -721,7 +795,7 @@ export const NeoDialog: React.FC<NeoDialogProps> = ({
               <NeoButton fontSize={12} label={closeLabel} color={AppColors.coral} onPressed={onClose} />
             </div>
           </div>
-        </WireFrame>
+        </WireFrameFrosted>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AppColors,
@@ -11,9 +11,8 @@ import {
   NeoRows,
   NeoStatBar,
   NeoTag,
-  useColorScheme,
   useResponsive,
-  WireFrame,
+  WireFrameFrosted,
 } from "../theme/AppTheme";
 
 import shadowSoldier from "../assets/shadows/shadow-soldier.png";
@@ -158,7 +157,7 @@ function ShadowDetail({
     <>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <NeoImage src={item.image} alt={item.name} size={120} isDark={isDark} />
+        <NeoImage src={item.image} alt={item.name} size={152} isDark={isDark} />
         <div style={{ minWidth: 0 }}>
           <div style={{ color: palette.ink, opacity: 0.7, fontWeight: 700, fontSize: 14 }}>{item.code}</div>
           <div style={{ color: palette.ink, fontWeight: 900, fontSize: 24, lineHeight: 1.2 }}>{item.name}</div>
@@ -239,7 +238,7 @@ export default function DataScreen() {
   const navigate = useNavigate();
   const responsive = useResponsive();
 
-  const { isDark, setIsDark } = useAppTheme();
+  const { isDark } = useAppTheme();
   const palette = isDark ? AppPalette.dark : AppPalette.light;
 
   const [view, setView] = useState<ViewMode>("grid");
@@ -309,6 +308,7 @@ export default function DataScreen() {
   return (
     <div
       style={{
+        ...dotBackground(palette.background, isDark ? "#ffffff30" : "#00000030"),
         minHeight: "100vh",
         width: "100%",
         display: "flex",
@@ -335,35 +335,24 @@ export default function DataScreen() {
           <NeoButton label="Back" color={AppColors.coral} onPressed={() => navigate("/")} />
           <h1
             style={{
-              color: palette.title,
+              color: isDark ? AppColors.oatmilk : AppColors.ink,
               fontWeight: 900,
               letterSpacing: 1.5,
-              fontSize: responsive.isDesktop ? 32 : 22,
+              fontSize: responsive.isDesktop ? 38 : 24,
               margin: 0,
             }}
           >
             Shadow Army
           </h1>
-          <h1
-            style={{
-              color: palette.title,
-              fontWeight: 900,
-              letterSpacing: 1.5,
-              fontSize: responsive.isDesktop ? 16 : 16,
-              margin: 0,
-            }}
-          >
-            (Sample Catalog)
-          </h1>
         </div>
 
         {/* Controls */}
-        <WireFrame color={palette.card} style={{ marginBottom: AppSpacing.md }} padding={AppSpacing.sm}>
+        <WireFrameFrosted isDark={isDark} frost={0.1}>
           <div style={{ display: "flex", flexDirection: "column", gap: AppSpacing.sm }}>
             {/* Rank tabs */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {CATEGORIES.map((c) => (
-                <NeoButton key={c} label={RANK_LABELS[c]} fontSize={16} color={category === c? palette.shell : ""} onPressed={() => setCategory(c)} />
+                <NeoButton key={c} label={RANK_LABELS[c]} fontSize={16} color={category === c? palette.paper : ""} labelColor={category === c? AppColors.ink : ""} onPressed={() => setCategory(c)} />
               ))}
             </div>
 
@@ -452,7 +441,7 @@ export default function DataScreen() {
               </div>
             )}
           </div>
-        </WireFrame>
+        </WireFrameFrosted>
 
         <div style={{ color: palette.ink, fontWeight: 700, fontSize: 14, marginBottom: AppSpacing.sm, paddingLeft: 4 }}>
           Showing {visibleItems.length} shadows from {RANK_LABELS[category]}
@@ -460,11 +449,11 @@ export default function DataScreen() {
 
         {/* Empty state */}
         {visibleItems.length === 0 && (
-          <WireFrame color={palette.card} padding={AppSpacing.md} margin={0}>
+          <WireFrameFrosted isDark={isDark} frost={0.1}>
             <div style={{ color: palette.ink, fontWeight: 700, textAlign: "center" }}>
               No shadows match your search or filters.
             </div>
-          </WireFrame>
+          </WireFrameFrosted>
         )}
 
         {/* Grid view */}
@@ -490,7 +479,7 @@ export default function DataScreen() {
                   onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())}
                   style={{ cursor: "pointer" }}
                 >
-                  <WireFrame color={palette.card} margin={0} padding={AppSpacing.sm}>
+                  <WireFrameFrosted isDark={isDark} frost={0.1}>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, textAlign: "center" }}>
                       <NeoImage src={it.image} alt={it.name} size={152} isDark={isDark} />
                       <div style={{ color: palette.ink, opacity: 0.7, fontWeight: 700, fontSize: 12 }}>{it.code}</div>
@@ -498,7 +487,7 @@ export default function DataScreen() {
                       <div style={{ color: palette.ink, fontWeight: 600, fontSize: 12 }}>{it.suffix}</div>
                       <MiniStats stats={it.stats} />
                     </div>
-                  </WireFrame>
+                  </WireFrameFrosted>
                 </div>
               );
             })}
@@ -507,7 +496,7 @@ export default function DataScreen() {
 
         {/* List view */}
         {view === "list" && visibleItems.length > 0 && (
-          <WireFrame color={palette.card} padding={0} margin={0}>
+          <WireFrameFrosted isDark={isDark} frost={0.1}>
             <div style={{ overflowX: "auto", borderRadius: 12 }}>
               <table style={{ width: "100%", borderCollapse: "collapse", color: palette.ink, fontSize: 15 }}>
                 <thead>
@@ -547,7 +536,7 @@ export default function DataScreen() {
                 </tbody>
               </table>
             </div>
-          </WireFrame>
+          </WireFrameFrosted>
         )}
       </div>
 
@@ -557,6 +546,7 @@ export default function DataScreen() {
           isDark={isDark}
           maxWidth={responsive.dialogWidth(560)}
           onClose={() => setSelectedId(null)}
+          frost={0.5}
         >
           <ShadowDetail
             item={selectedItem}
@@ -569,3 +559,14 @@ export default function DataScreen() {
     </div>
   );
 }
+
+export const dotBackground = (
+  bg: string,
+  dot: string,
+  gap = 26,
+  size = 2
+): CSSProperties => ({
+  backgroundColor: bg,
+  backgroundImage: `radial-gradient(${dot} ${size}px, transparent ${size}px)`,
+  backgroundSize: `${gap}px ${gap}px`,
+});
