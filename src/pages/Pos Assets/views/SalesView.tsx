@@ -43,7 +43,7 @@ export function SalesView({ sales, onVoid, settings, isDark }: Props) {
       <div>
         <h2 style={heading}>All invoices ({sales.length})</h2>
         {sales.length === 0 && card(<p style={{ color: p.ink, fontSize: 15, margin: 0 }}>No sales yet. Completed sales show up here.</p>)}
-        <div style={{ display: "grid", gap: 12, alignItems: "start", gridTemplateColumns: "repeat(auto-fill, minmax(max(260px, calc((100% - 48px) / 5)), 1fr))" }}>
+        <div style={{ display: "grid", gap: 12, alignItems: "start", gridTemplateColumns: "repeat(auto-fill, minmax(max(200, calc((100% - 48px) / 3)), 1fr))" }}>
           {sales.map((x) => card(<>
             <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: AppSpacing.sm, color: p.ink }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
@@ -52,7 +52,9 @@ export function SalesView({ sales, onVoid, settings, isDark }: Props) {
                 {!x.voided && x.zNo !== undefined && <NeoTag text={`Closed by Z-reading #${x.zNo}`} isDark={isDark} />}
               </div>
               <span style={{ fontSize: 14 }}>{new Date(x.at).toLocaleString("en-PH")}</span>
-              <strong style={{ textDecoration: x.voided ? "line-through" : "none" }}>{peso(x.totals.gross)}</strong>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: AppSpacing.sm, color: p.ink, paddingTop:12, paddingBottom: 12}}>
+            <strong style={{ textDecoration: x.voided ? "line-through" : "none" }}>{peso(x.totals.gross)}</strong>
             </div>
             {x.voided && <p style={{ color: p.ink, fontSize: 13, margin: `${AppSpacing.xs}px 0 0` }}>Voided: {x.voidReason}</p>}
             <div style={{ display: "flex", flexWrap: "wrap", gap: AppSpacing.sm, marginTop: AppSpacing.sm }}>

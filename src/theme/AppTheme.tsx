@@ -570,7 +570,7 @@ export function NeoTag({ text, isDark = false }: { text: string; isDark?: boolea
         color: p.ink,
         borderRadius: 8,
         padding: "1px 8px",
-        fontSize: 12,
+        fontSize: 17,
         fontWeight: 700,
         whiteSpace: "nowrap",
       }}
@@ -602,8 +602,9 @@ export function NeoStatBar({
       <div
         style={{
           flex: 1,
+          height: 12,
           borderRadius: 7,
-          border: `2px solid ${AppColors.ink}`,
+          border: `3px solid ${AppColors.ink}`,
           backgroundColor: p.chip,
           overflow: "hidden",
           boxSizing: "border-box",

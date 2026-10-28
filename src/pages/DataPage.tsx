@@ -31,6 +31,7 @@ import kaisel from "../assets/shadows/kaisel.png";
 import bellion from "../assets/shadows/bellion.png";
 import beru from "../assets/shadows/beru.png";
 import kamish from "../assets/shadows/kamish.png";
+import { useAppTheme } from "../theme/ThemeContext";
 
 type ViewMode = "grid" | "list";
 
@@ -238,7 +239,7 @@ export default function DataScreen() {
   const navigate = useNavigate();
   const responsive = useResponsive();
 
-  const isDark = useColorScheme() === "dark";
+  const { isDark, setIsDark } = useAppTheme();
   const palette = isDark ? AppPalette.dark : AppPalette.light;
 
   const [view, setView] = useState<ViewMode>("grid");
@@ -362,7 +363,7 @@ export default function DataScreen() {
             {/* Rank tabs */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {CATEGORIES.map((c) => (
-                <NeoButton key={c} label={RANK_LABELS[c]} fontSize={14} isDark={category === c} onPressed={() => setCategory(c)} />
+                <NeoButton key={c} label={RANK_LABELS[c]} fontSize={16} color={category === c? palette.shell : ""} onPressed={() => setCategory(c)} />
               ))}
             </div>
 

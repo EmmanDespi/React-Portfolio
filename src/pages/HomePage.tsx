@@ -7,11 +7,11 @@ import {
   NeoAvatar,
   NeoButton,
   NeoSwitch,
-  useColorScheme,
   useResponsive,
   WireFrame,
 } from "../theme/AppTheme";
 import { FloatingButton } from "../theme/FloatingButton";
+import { useAppTheme } from "../theme/ThemeContext";
 
 const HEADER_ROW_MIN_WIDTH = 1000;
 
@@ -131,14 +131,7 @@ function TechChip({ label, isDark }: { label: string; isDark: boolean }) {
 // ==========================================
 
 export default function HomeScreen() {
-  const systemScheme = useColorScheme();
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    return systemScheme === "dark";
-  });
-
-  const toggleTheme = (value: boolean) => {
-    setIsDark(value);
-  };
+  const { isDark, setIsDark } = useAppTheme();
 
   const responsive = useResponsive();
   const { isMobile, isDesktop, isLargeDesktop, dashboardWidth } = responsive;
@@ -257,7 +250,7 @@ export default function HomeScreen() {
         >
           <span aria-hidden>💼</span> Resume
         </a>
-        <NeoSwitch value={isDark} onValueChange={toggleTheme} />
+        <NeoSwitch value={isDark} onValueChange={setIsDark} />
       </div>
     </div>
   );
@@ -393,7 +386,7 @@ export default function HomeScreen() {
               }}
             >
               <NeoButton label="POS System" onPressed={() => navigate("/pos")} />
-
+              <NeoButton label="Catalog" onPressed={() => navigate("/data")} />
             </div>
         </div>
       )}

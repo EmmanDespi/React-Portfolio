@@ -13,6 +13,7 @@ import { ReportsView } from "./Pos Assets/views/ReportsView";
 import { SettingsView } from "./Pos Assets/views/SettingsView";
 import { FloatingButton } from "../theme/FloatingButton";
 import { AppColors, AppPalette, AppSpacing, NeoButton, NeoSwitch, WireFrame, useResponsive } from "../theme/AppTheme";
+import { useAppTheme } from "../theme/ThemeContext";
 
 type Tab = "sell" | "inventory" | "sales" | "reports" | "settings";
 const TABS: [Tab, string][] = [["sell", "Sell"], ["inventory", "Inventory"], ["sales", "Sales"], ["reports", "Reports"], ["settings", "Settings"]];
@@ -29,7 +30,7 @@ export default function POSPage() {
   const [lastId, setLastId] = useState<string | null>(null);
 
   // Same dark-mode setup as HomePage: start from the system scheme, toggle with NeoSwitch.
-  const [isDark, setIsDark] = useState<boolean>(false);
+  const { isDark, setIsDark } = useAppTheme();
   const responsive = useResponsive();
   const p = isDark ? AppPalette.dark : AppPalette.light;
   const shellWidth = responsive.isLargeDesktop ? responsive.width * 0.7 : responsive.dashboardWidth;
@@ -210,7 +211,7 @@ export default function POSPage() {
               {s.settings.taxMode === "VAT" ? "VAT-registered" : "Non-VAT"} • saved on this device
             </div>
           </div>
-          <NeoSwitch value={isDark} onValueChange={setIsDark} />
+          {/* <NeoSwitch value={isDark} onValueChange={setIsDark} /> */}
         </div>
 
         <div style={{ height: AppSpacing.md }} />
