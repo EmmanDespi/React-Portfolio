@@ -365,7 +365,6 @@ export default function HomeScreen() {
         flexDirection: "column",
         alignItems: "center",
         paddingTop: 42,
-        paddingBottom: 80,
         backgroundColor: p.background,
       }}
     >
@@ -380,7 +379,7 @@ export default function HomeScreen() {
         <div
           style={{
             position: "fixed",
-            bottom: 90, // Positioned right above the floating button
+            bottom: 90, 
             right: 24,
             zIndex: 1000,
             animation: "fadeIn 0.2s ease-out",
