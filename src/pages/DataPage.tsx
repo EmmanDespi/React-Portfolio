@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AppColors,
@@ -251,10 +251,10 @@ export default function DataScreen() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  useEffect(() => {
-    document.documentElement.style.backgroundColor = palette.background;
-    document.body.style.backgroundColor = palette.background;
-  }, [palette.background]);
+  // useEffect(() => {
+  //   document.documentElement.style.backgroundColor = palette.background;
+  //   document.body.style.backgroundColor = palette.background;
+  // }, [palette.background]);
 
   // Apply rank tab, class chip, search, origin filter, then sort
   const visibleItems = useMemo(() => {
