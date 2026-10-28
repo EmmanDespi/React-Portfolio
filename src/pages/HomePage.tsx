@@ -139,11 +139,12 @@ export default function HomeScreen() {
   const p = isDark ? AppPalette.dark : AppPalette.light;
 
   const ink = isDark ? AppColors.oatmilk : p.ink;
-  const aboutWidth = dashboardWidth * (isMobile ? 0.87 : isLargeDesktop ? 0.6 : 0.45);
-  const expWidth = dashboardWidth * (isMobile ? 0.87 : isLargeDesktop ? 0.28 : 0.45);
-
   const stacked = dashboardWidth - 28 < HEADER_ROW_MIN_WIDTH;
   const headerWidth = dashboardWidth - 28;
+  const aboutWidth = dashboardWidth * (isMobile ? 0.87 : isLargeDesktop ? 0.5 : 0.45);
+  const expWidth = dashboardWidth * (isMobile ? 0.87 : isLargeDesktop ? 0.4  : !stacked ? 0.28 : 0.45);
+
+  
 
   // ---------- shared text styles ----------
   const headerText = (size: number, weight: number): CSSProperties => ({
@@ -173,8 +174,9 @@ export default function HomeScreen() {
   const rule = <hr style={{ border: "none", borderTop: `2px solid ${ink}`, margin: 0 }} />;
 
   // ---------- header ----------
-  const avatarSize = stacked
-    ? { w: headerWidth * 0.22, h: headerWidth * 0.22 }
+  const avatarSize = responsive.isMobile
+    ? { w: headerWidth * 0.35, h: headerWidth * 0.35 } : 
+    responsive.isTablet || stacked ? { w: headerWidth * 0.25, h: headerWidth * 0.25 }
     : { w: headerWidth * 0.12, h: responsive.height * 0.11 };
 
   const avatarFace = (src: string, fit: CSSProperties["objectFit"]) => (
@@ -360,6 +362,7 @@ export default function HomeScreen() {
         flexDirection: "column",
         alignItems: "center",
         paddingTop: 42,
+        paddingBottom: AppSpacing.lg,
         backgroundColor: p.background,
       }}
     >
