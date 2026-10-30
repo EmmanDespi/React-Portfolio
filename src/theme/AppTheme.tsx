@@ -270,7 +270,7 @@ export const WireFrameFrosted: React.FC<WireFrameFrostedProps> = ({
   borderRadius = 6,
   borderWidth = 2,
   color,
-  borderColor = AppColors.ink,
+  borderColor,
   isDark = true,
   frost = 0.5,
   blur,
@@ -280,8 +280,10 @@ export const WireFrameFrosted: React.FC<WireFrameFrostedProps> = ({
 
   const f = Math.max(0, Math.min(1, frost));
   const blurPx = blur ?? f * 20;          // 0 to 20px
-  const alpha = 0.15 + f * 0.6;           // 0.15 to 0.75
+  const alpha = 0.10 + f * 0.6;           // 0.15 to 0.75
   const filter = `blur(${blurPx}px) saturate(150%)`;
+
+  const borderColored = borderColor || p.ink
 
   return (
     <div style={{ position: "relative", width, minHeight, margin, ...style }}>
@@ -296,7 +298,7 @@ export const WireFrameFrosted: React.FC<WireFrameFrostedProps> = ({
           backdropFilter: filter,
           WebkitBackdropFilter: filter, // Safari
           borderRadius,
-          border: `${borderWidth}px solid ${borderColor}`,
+          border: `${borderWidth}px solid ${borderColored}`,
           boxSizing: "border-box",
         }}
       >
