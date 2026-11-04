@@ -33,7 +33,7 @@ export default function POSPage() {
   const { isDark } = useAppTheme();
   const responsive = useResponsive();
   const p = isDark ? AppPalette.dark : AppPalette.light;
-  const shellWidth = responsive.isLargeDesktop ? responsive.width * 0.7 : responsive.dashboardWidth;
+  const shellWidth = responsive.isDesktop ? responsive.width * 0.7 : responsive.dashboardWidth;
 
   useEffect(() => { save(s); }, [s]);
   useEffect(() => {

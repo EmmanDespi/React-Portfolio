@@ -15,8 +15,6 @@ import {
 import { FloatingButton } from "../theme/FloatingButton";
 import { useAppTheme } from "../theme/ThemeContext";
 
-const HEADER_ROW_MIN_WIDTH = 1000;
-
 // ==========================================
 // DATA
 // ==========================================
@@ -165,7 +163,6 @@ export default function HomeScreen() {
 
   const ink = isDark ? AppColors.oatmilk : p.ink;
   const stacked = isMobile;;
-  const aboutWidth = dashboardWidth * (isMobile ? 0.87 : isDesktop ? 0.5 : 0.45);
   const expWidth = dashboardWidth * (isMobile ? 0.87 : isDesktop ? 0.45 : isTablet ? 0.45 : 0.45);
 
   
