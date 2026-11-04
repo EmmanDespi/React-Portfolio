@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { useAppTheme } from "../theme/ThemeContext";
-import { AppPalette, AppSpacing, NeoFloatingMenu, useResponsive, WireFrameFrosted } from "../theme/AppTheme";
+import { AppColors, AppPalette, AppSpacing, NeoButton, NeoFloatingMenu, useResponsive, WireFrameFrosted } from "../theme/AppTheme";
 import { useDb } from "./HealthCareAssets/store";
 import { describeActor } from "./HealthCareAssets/selectors";
 import { DEMO_ACTORS, ROLE_LABELS } from "./HealthCareAssets/data/demoActors";
@@ -10,6 +10,8 @@ import DoctorView from "./HealthCareAssets/views/DoctorView";
 import NurseView from "./HealthCareAssets/views/NurseView";
 import HmoView from "./HealthCareAssets/views/HmoView";
 import HospitalAdminView from "./HealthCareAssets/views/HospitalAdminView";
+import { FloatingButton } from "../theme/FloatingButton";
+import { useNavigate } from "react-router-dom";
 
 const VIEWS = {
   patient: PatientView,
@@ -20,7 +22,9 @@ const VIEWS = {
 } as const;
 
 export default function HealthCare() {
+  const navigate = useNavigate();
   const { isDark } = useAppTheme();
+  const [isOpen, setIsOpen] = useState(false);
   const responsive = useResponsive();
   const p = isDark ? AppPalette.dark : AppPalette.light;
   const shellWidth = responsive.width > 1400 ? responsive.width * 0.7 : responsive.width * 0.9;
@@ -88,6 +92,26 @@ export default function HealthCare() {
         paddingTop: 22, paddingBottom: AppSpacing.lg, backgroundColor: p.background,
       }}
     >
+    <FloatingButton
+            onClick={() => setIsOpen(!isOpen)}
+            color={isOpen ? AppColors.coral : AppColors.lime}
+            label={isOpen ? "✖" : "☰"}
+            />
+            {isOpen && (
+            <div
+                style={{
+                position: "fixed",
+                bottom: 90,
+                right: 24,
+                zIndex: 1000,
+                animation: "fadeIn 0.2s ease-out",
+                }}
+            >
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <NeoButton label="Home" onPressed={() => navigate("/")} />
+                </div>
+            </div>
+            )}
       <NeoFloatingMenu
         label={`Role: ${ROLE_LABELS[role].label}`}
         value={role}

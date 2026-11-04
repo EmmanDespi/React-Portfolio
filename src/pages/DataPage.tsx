@@ -31,6 +31,7 @@ import bellion from "../assets/shadows/bellion.png";
 import beru from "../assets/shadows/beru.png";
 import kamish from "../assets/shadows/kamish.png";
 import { useAppTheme } from "../theme/ThemeContext";
+import { FloatingButton } from "../theme/FloatingButton";
 
 type ViewMode = "grid" | "list";
 
@@ -239,6 +240,7 @@ export default function DataScreen() {
   const responsive = useResponsive();
 
   const { isDark } = useAppTheme();
+  const [isOpen, setIsOpen] = useState(false);
   const palette = isDark ? AppPalette.dark : AppPalette.light;
 
   const [view, setView] = useState<ViewMode>("grid");
@@ -320,6 +322,26 @@ export default function DataScreen() {
         boxSizing: "border-box",
       }}
     >
+      <FloatingButton
+              onClick={() => setIsOpen(!isOpen)}
+              color={isOpen ? AppColors.coral : AppColors.lime}
+              label={isOpen ? "✖" : "☰"}
+            />
+            {isOpen && (
+              <div
+                style={{
+                  position: "fixed",
+                  bottom: 90,
+                  right: 24,
+                  zIndex: 1000,
+                  animation: "fadeIn 0.2s ease-out",
+                }}
+              >
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <NeoButton label="Home" onPressed={() => navigate("/")} />
+                </div>
+              </div>
+            )}
       <div
         style={{
           width: responsive.dashboardWidth,

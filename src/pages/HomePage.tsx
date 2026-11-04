@@ -12,7 +12,6 @@ import {
   WireFrame,
   WireFrameFrosted,
 } from "../theme/AppTheme";
-import { FloatingButton } from "../theme/FloatingButton";
 import { useAppTheme } from "../theme/ThemeContext";
 
 // ==========================================
@@ -446,36 +445,6 @@ export default function HomeScreen() {
         backgroundColor: p.background,
       }}
     >
-      <FloatingButton
-        onClick={() => setIsOpen(!isOpen)}
-        color={isOpen ? AppColors.coral : AppColors.lime}
-        label={
-          isOpen ? "x" : "="
-        }
-      />
-      {isOpen && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 90, 
-            right: 24,
-            zIndex: 1000,
-            animation: "fadeIn 0.2s ease-out",
-          }}
-        >
-          <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-              }}
-            >
-              <NeoButton label="POS System" onPressed={() => navigate("/pos")} />
-                <NeoButton label="Health Care" onPressed={() => navigate("/healthcare")} />
-              <NeoButton label="Catalog" onPressed={() => navigate("/data")} />
-            </div>
-        </div>
-      )}
       <WireFrameFrosted width={dashboardWidth} isDark={isDark} frost={0.05}>
         {header}
         <div style={{ height: 24 }} />
