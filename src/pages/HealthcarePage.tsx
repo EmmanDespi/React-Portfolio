@@ -118,6 +118,8 @@ export default function HealthCare() {
         isDark={isDark}
         onChange={setRole}
         options={(Object.keys(ROLE_LABELS) as Role[]).map((r) => ({ value: r, label: ROLE_LABELS[r].label, hint: ROLE_LABELS[r].hint }))}
+        bottom={30}
+        right={100}
       />
       <WireFrameFrosted width={shellWidth} isDark={isDark} frost={0.05} padding={8}>
         {header}

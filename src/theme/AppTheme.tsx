@@ -1142,19 +1142,23 @@ export function NeoFloatingMenu<T extends string>({
   label,
   options,
   value,
+  bottom,
+  right,
   onChange,
   isDark = false,
 }: {
   label: string;
   options: { value: T; label: string; hint?: string }[];
   value: T;
+  bottom: number;
+  right: number;
   onChange: (v: T) => void;
   isDark?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const p = isDark ? AppPalette.dark : AppPalette.light;
   return (
-    <div style={{ position: "fixed", top: 12, right: 16, zIndex: 900, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
+    <div style={{ position: "fixed", bottom, right, zIndex:1000, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
       <NeoButton label={label} fontSize={13} color={AppColors.coral} labelColor={AppColors.ink} isDark={isDark} onPressed={() => setOpen((o) => !o)} />
       {open && (
         <div style={{ width: 230, border: `2px solid ${AppColors.ink}`, borderRadius: 8, backgroundColor: p.card, boxShadow: `4px 4px 0 ${p.shadow}`, padding: 8, display: "flex", flexDirection: "column", gap: 6 }}>
