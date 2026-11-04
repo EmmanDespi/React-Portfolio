@@ -6,6 +6,7 @@ import {
   AppSpacing,
   NeoAvatar,
   NeoButton,
+  NeoChip,
   NeoSwitch,
   useResponsive,
   WireFrame,
@@ -33,6 +34,50 @@ const experiences = [
 const frontEndTechs = [
   "Flutter", "HTML", "CSS", "React.js", "React Native",
   "SwiftUI", "Vite", "Tailwind CSS", "Material UI",
+];
+const createProjectPreview = (title: string, accent: string, label: string) => {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">
+      <rect width="480" height="270" rx="18" fill="#171713"/>
+      <rect x="14" y="14" width="452" height="242" rx="12" fill="#f3efe2"/>
+      <rect x="14" y="14" width="452" height="34" rx="12" fill="#e2dacb"/>
+      <circle cx="34" cy="31" r="5" fill="#ef6249"/>
+      <circle cx="52" cy="31" r="5" fill="#ffbf00"/>
+      <circle cx="70" cy="31" r="5" fill="#d7f34a"/>
+      <rect x="30" y="64" width="110" height="176" rx="8" fill="#211832"/>
+      <rect x="158" y="66" width="184" height="18" rx="6" fill="${accent}"/>
+      <rect x="158" y="96" width="276" height="8" rx="4" fill="#c2a178"/>
+      <rect x="158" y="116" width="226" height="8" rx="4" fill="#c2a178"/>
+      <rect x="158" y="148" width="126" height="76" rx="8" fill="#ff fefa"/>
+      <rect x="296" y="148" width="138" height="76" rx="8" fill="#e2dacb"/>
+      <text x="158" y="178" fill="#171713" font-family="Arial, sans-serif" font-size="16" font-weight="700">${label}</text>
+      <text x="158" y="242" fill="#171713" font-family="Arial, sans-serif" font-size="14" font-weight="700">${title}</text>
+    </svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+};
+
+const projects = [
+  {
+    title: "Point of Sale",
+    subtitle: "Retail sales and inventory",
+    description: "A point-of-sale experience for managing products, inventory, sales, reports, and store settings.",
+    path: "/pos",
+    image: createProjectPreview("Point of Sale", "#ef6249", "Checkout"),
+  },
+  {
+    title: "Shadow Catalog",
+    subtitle: "Searchable character catalog",
+    description: "Browse and filter a shadow collection with detailed profiles, stats, and grid or list views.",
+    path: "/data",
+    image: createProjectPreview("Shadow Catalog", "#d7f34a", "Collection"),
+  },
+  {
+    title: "Healthcare",
+    subtitle: "Healthcare profile dashboard",
+    description: "A healthcare-themed dashboard presenting member details and policy information.",
+    path: "/healthcare",
+    image: createProjectPreview("Healthcare", "#38515a", "Member profile"),
+  },
 ];
 
 const backEndTechs = [
@@ -106,27 +151,6 @@ function FlipCard({
   );
 }
 
-function TechChip({ label, isDark }: { label: string; isDark: boolean }) {
-  const p = isDark ? AppPalette.dark : AppPalette.light;
-  return (
-    <span
-      style={{
-        border: `2px solid ${p.ink}`,
-        borderRadius: 8,
-        padding: "3px 10px",
-        fontSize: 16,
-        fontWeight: 700,
-        letterSpacing: 1,
-        color: isDark ? AppColors.oatmilk : p.ink,
-        backgroundColor: p.shell,
-        whiteSpace: "nowrap",
-      }}
-    >
-      {label}
-    </span>
-  );
-}
-
 // ==========================================
 // PAGE
 // ==========================================
@@ -135,14 +159,14 @@ export default function HomeScreen() {
   const { isDark, setIsDark } = useAppTheme();
 
   const responsive = useResponsive();
-  const { isMobile, isLargeDesktop, dashboardWidth } = responsive;
+  const dashboardWidth = responsive.width * ((responsive.isDesktop &&responsive.width < 1850) ? 0.8 : responsive.isDesktop ? 0.6 : responsive.isMobile ? 0.95 : 0.95);
+  const { isMobile, isTablet, isDesktop } = responsive;
   const p = isDark ? AppPalette.dark : AppPalette.light;
 
   const ink = isDark ? AppColors.oatmilk : p.ink;
-  const stacked = dashboardWidth - 28 < HEADER_ROW_MIN_WIDTH;
-  const headerWidth = dashboardWidth - 28;
-  const aboutWidth = dashboardWidth * (isMobile ? 0.87 : isLargeDesktop ? 0.5 : 0.45);
-  const expWidth = dashboardWidth * (isMobile ? 0.87 : isLargeDesktop ? 0.4  : !stacked ? 0.28 : 0.45);
+  const stacked = isMobile;;
+  const aboutWidth = dashboardWidth * (isMobile ? 0.87 : isDesktop ? 0.5 : 0.45);
+  const expWidth = dashboardWidth * (isMobile ? 0.87 : isDesktop ? 0.45 : isTablet ? 0.45 : 0.45);
 
   
 
@@ -175,9 +199,9 @@ export default function HomeScreen() {
 
   // ---------- header ----------
   const avatarSize = responsive.isMobile
-    ? { w: headerWidth * 0.35, h: headerWidth * 0.35 } : 
-    responsive.isTablet || stacked ? { w: headerWidth * 0.25, h: headerWidth * 0.25 }
-    : { w: headerWidth * 0.12, h: responsive.height * 0.11 };
+    ? { w: dashboardWidth * 0.3, h: dashboardWidth * 0.3 } : 
+    responsive.isTablet || stacked ? { w: 120, h: 120 }
+    : { w: 160, h: 160 };
 
   const avatarFace = (src: string, fit: CSSProperties["objectFit"]) => (
     <div
@@ -213,14 +237,16 @@ export default function HomeScreen() {
 
   const nameBlock = (
     <div style={{ display: "flex", flexDirection: "column", alignItems: align, textAlign, paddingTop: AppSpacing.sm, minWidth: 0, }}>
-      <h1 style={{ ...headerText(stacked ? 20 : 22, 900), letterSpacing: 2.5 }}>Emmanuel Despi</h1>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: stacked ? "center" : "flex-start" }}>
+      <h1 style={{ ...headerText(stacked ? 20 : 22, 900), letterSpacing: 2.5, paddingBottom: AppSpacing.xs }}>Emmanuel Despi</h1>
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: stacked ? "center" : "flex-start" }}>
         <span style={headerText(stacked ? 16 : 20, 500)}>BSCPE</span>
-        <span style={headerText(16, 500)}>• Far Eastern University</span>
-        <span style={headerText(16, 500)}>Institute of Technology</span>
+        <span style={{...headerText(18, 500), paddingLeft: 12}}>  @ Far Eastern University</span>
+        <span style={headerText(16, 500)}>  Institute of Technology</span>
       </div>
-      <div style={headerText(stacked ? 14 : 16, 500)}>
-        Software Engineer • Full Stack Developer • Technical Consultant
+      <div style={{...headerText(stacked ? 14 : 16, 500), display: "flex", flexDirection: "column", flexWrap: "nowrap"}}>
+        <span style={headerText(16, 500)}>• Software Engineer</span>
+        <span style={headerText(16, 500)}>• Full Stack Developer</span>
+        <span style={headerText(16, 500)}>• Technical Consultant</span>
       </div>
 
       <div
@@ -279,13 +305,13 @@ export default function HomeScreen() {
         display: "flex",
         alignItems: "flex-start",
         gap: AppSpacing.sm,
-        paddingLeft: headerWidth * 0.015,
-        paddingRight: headerWidth * 0.015,
+        paddingLeft: dashboardWidth * 0.015,
+        paddingRight: dashboardWidth * 0.015,
       }}
     >
       {avatar}
       <div style={{ flex: 1, minWidth: 0 }}>{nameBlock}</div>
-      <div style={{ marginLeft: headerWidth * 0.05 }}>{contactBlock}</div>
+      <div style={{ marginLeft: dashboardWidth * 0.05 }}>{contactBlock}</div>
     </div>
   );
 
@@ -303,7 +329,7 @@ export default function HomeScreen() {
       <h3 style={subheading}>{label}</h3>
       <div style={{ display: "flex", flexWrap: "wrap", gap: AppSpacing.sm, marginTop: AppSpacing.sm }}>
         {items.map((t) => (
-          <TechChip key={t} label={t} isDark={isDark} />
+          <NeoChip key={t} label={t} isDark={isDark} />
         ))}
       </div>
     </div>
@@ -325,9 +351,65 @@ export default function HomeScreen() {
     </div>
   );
 
+  // ---------- projects ------------
+  const projectPanel = (
+    <div style={{ display: "flex", flexDirection: "column", gap: AppSpacing.sm }}>
+      {projects.map((project) => (
+        <button
+          key={project.path}
+          type="button"
+          onClick={() => navigate(project.path)}
+          aria-label={`Open ${project.title}: ${project.description}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: AppSpacing.md,
+            width: "100%",
+            padding: AppSpacing.sm,
+            border: `2px solid ${ink}`,
+            borderRadius: 8,
+            backgroundColor: p.card,
+            color: ink,
+            textAlign: "left",
+            cursor: "pointer",
+          }}
+        >
+          <img
+            src={project.image}
+            alt=""
+            style={{
+              display: "block",
+              width: isMobile ? 100 : 180,
+              aspectRatio: "16 / 9",
+              objectFit: "cover",
+              flexShrink: 0,
+              border: `2px solid ${ink}`,
+              borderRadius: 6,
+            }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: p.ink, fontSize: 13, fontWeight: 700, letterSpacing: 1.5 }}>
+              {project.subtitle}
+            </div>
+            <h3 style={{ color: ink, fontSize: 18, fontWeight: 900, letterSpacing: 1.5, margin: "4px 0" }}>
+              {project.title}
+            </h3>
+            <p style={{ color: p.ink, fontSize: 14, lineHeight: 1.5, margin: 0 }}>
+              {project.description}
+            </p>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
   // ---------- experience ----------
   const experiencePanel = (
-    <div>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+      }} 
+    > 
       <h2 style={heading}>Work Experience</h2>
       <div style={{ height: 22 }} />
       {experiences.map((exp, i) => (
@@ -335,8 +417,8 @@ export default function HomeScreen() {
           <div style={{ display: "flex", alignItems: "flex-start", gap: AppSpacing.sm }}>
             <NeoAvatar initials={exp.initials} isDark={isDark} />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: ink, fontSize: 13, fontWeight: 800, letterSpacing: 1.5 }}>{exp.title}</div>
-              <div style={{ color: ink, fontSize: 13, fontWeight: 400, letterSpacing: 1.5, marginTop: 4 }}>
+              <div style={{ color: ink, fontSize: 16, fontWeight: 800, letterSpacing: 1.5 }}>{exp.title}</div>
+              <div style={{ color: ink, fontSize: 14, fontWeight: 400, letterSpacing: 1.5, marginTop: 4 }}>
                 {exp.company}
               </div>
             </div>
@@ -361,8 +443,9 @@ export default function HomeScreen() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        paddingTop: 42,
+        paddingTop: 32,
         paddingBottom: AppSpacing.lg,
+        padding: "16px 12px",
         backgroundColor: p.background,
       }}
     >
@@ -391,6 +474,7 @@ export default function HomeScreen() {
               }}
             >
               <NeoButton label="POS System" onPressed={() => navigate("/pos")} />
+                <NeoButton label="Health Care" onPressed={() => navigate("/healthcare")} />
               <NeoButton label="Catalog" onPressed={() => navigate("/data")} />
             </div>
         </div>
@@ -405,7 +489,8 @@ export default function HomeScreen() {
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
             justifyContent: "center",
-            alignItems: isMobile ? "center" : "flex-start",
+            alignItems: isMobile ? "center" : "stretch",
+            gap: isDesktop ? AppSpacing.md : AppSpacing.sm,
           }}
         >
           {isMobile && (
@@ -413,20 +498,21 @@ export default function HomeScreen() {
               color={p.card}
               isDark={isDark}
               width={expWidth}
-              height="auto"
+              height="100%"
               padding={AppSpacing.sm}
               borderRadius={8}
-              style={{ margin: `${AppSpacing.md}px 4px ${AppSpacing.sm}px`, maxWidth: "100%" }}
+              style={{ marginBottom: AppSpacing.sm, maxWidth: "100%", flexShrink: 1 }}
             >
               {experiencePanel}
             </WireFrame>
+            
           )}
 
           <WireFrame
             color={p.card}
             isDark={isDark}
-            width={aboutWidth}
-            height="auto"
+            width={expWidth}
+            height="100%"
             padding={AppSpacing.sm}
             borderRadius={8}
             style={{ marginBottom: AppSpacing.sm, maxWidth: "100%", flexShrink: 1 }}
@@ -439,15 +525,17 @@ export default function HomeScreen() {
               color={p.card}
               isDark={isDark}
               width={expWidth}
-              height="auto"
+              height="100%"
               padding={AppSpacing.sm}
               borderRadius={8}
-              style={{ margin: "4px 12px 12px 22px", maxWidth: "100%", flexShrink: 1 }}
+              style={{ marginBottom: AppSpacing.sm, maxWidth: "100%", flexShrink: 1 }}
             >
               {experiencePanel}
             </WireFrame>
           )}
         </div>
+        {sectionDivider("Projects")}
+        {projectPanel}
       </WireFrameFrosted>
     </div>
   );

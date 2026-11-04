@@ -91,9 +91,10 @@ export function useColorScheme(): "dark" | "light" {
 // ==========================================
 
 const BREAKPOINTS = {
-  mobile: 600,
-  tablet: 1024,
-  desktop: 1440,
+  mobile: 800,
+  tablet: 1100,
+  desktop: 2000,
+  largeDesktop: 2400,
 };
 
 export function useResponsive() {
@@ -119,12 +120,11 @@ export function useResponsive() {
   const isMobile = width < BREAKPOINTS.mobile;
   const isTablet = width >= BREAKPOINTS.mobile && width < BREAKPOINTS.tablet;
   const isDesktop = width >= BREAKPOINTS.tablet;
-  const isLargeDesktop = width >= BREAKPOINTS.desktop;
 
   const dashboardWidth = () => {
     if (isMobile) return width * 0.97;
     if (isTablet) return width * 0.95;
-    if (isLargeDesktop) return width * 0.5;
+    if (isDesktop) return width * 0.6;
     return width * 0.7;
   };
 
@@ -150,7 +150,6 @@ export function useResponsive() {
     isMobile,
     isTablet,
     isDesktop,
-    isLargeDesktop,
     dashboardWidth: dashboardWidth(),
     pagePadding: pagePadding(),
     dialogWidth,
@@ -550,7 +549,7 @@ export const NeoChip: React.FC<NeoChipProps> = ({
   active = false,
   onPressed,
   activeColor = AppColors.paper,
-  fontSize = 14,
+  fontSize = 16,
   isDark = false,
   style,
 }) => {
@@ -564,11 +563,12 @@ export const NeoChip: React.FC<NeoChipProps> = ({
       style={{
         border: `2px solid ${AppColors.ink}`,
         borderRadius: 999,
-        padding: "4px 12px",
+        padding: "4px 10px",
         fontSize,
         fontWeight: 700,
+        letterSpacing: 1,
         cursor: onPressed ? "pointer" : "default",
-        backgroundColor: active ? activeColor : AppColors.stone,
+        backgroundColor: active ? activeColor : p.shell,
         color: active ? AppColors.ink : p.ink,
         ...style,
       }}

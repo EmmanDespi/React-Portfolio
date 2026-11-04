@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import HomeScreen from "./pages/HomePage";
 import DataScreen from "./pages/DataPage";
 import PosScreen from "./pages/POSPage";
+import HealthCare from "./pages/HealthcarePage";
 
 export default function App() {
   return (
@@ -9,6 +10,7 @@ export default function App() {
       <Route path="/" element={<HomeScreen />} />
       <Route path="/data" element={<DataScreen />} />
       <Route path="/pos" element={<PosScreen />} />
+      <Route path="/healthcare" element={<HealthCare />} />
     </Routes>
   );
 }

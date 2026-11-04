@@ -29,7 +29,7 @@ export default function POSPage() {
   const [notice, setNotice] = useState("");
   const [lastId, setLastId] = useState<string | null>(null);
 
-  // Same dark-mode setup as HomePage: start from the system scheme, toggle with NeoSwitch.
+  // Shared theme preference controlled by the HomePage NeoSwitch.
   const { isDark } = useAppTheme();
   const responsive = useResponsive();
   const p = isDark ? AppPalette.dark : AppPalette.light;

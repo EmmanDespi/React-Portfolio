@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { AppPalette, useColorScheme } from "./AppTheme";
+import { AppPalette } from "./AppTheme";
 
 type ThemeContextValue = {
   isDark: boolean;
@@ -9,14 +9,13 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const systemScheme = useColorScheme();
-  const [isDark, setIsDark] = useState<boolean>(() => systemScheme === "dark");
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-  const bg = (isDark ? AppPalette.dark : AppPalette.light).background;
-  document.documentElement.style.backgroundColor = bg;
-  document.body.style.backgroundColor = bg;
-}, [isDark]);
+    const bg = (isDark ? AppPalette.dark : AppPalette.light).background;
+    document.documentElement.style.backgroundColor = bg;
+    document.body.style.backgroundColor = bg;
+  }, [isDark]);
 
   return (
     <ThemeContext.Provider value={{ isDark, setIsDark }}>
