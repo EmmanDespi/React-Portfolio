@@ -58,11 +58,11 @@ export default function HealthCare() {
     </div>
   );
 
-  const dataBlock = (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginTop: "auto" }}>
-      <div style={{ ...headerText(16, 500), paddingBottom: 8 }}>{info.place}</div>
-    </div>
-  );
+//   const dataBlock = (
+//     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginTop: "auto" }}>
+//       <div style={{ ...headerText(16, 500), paddingBottom: 8 }}>{info.place}</div>
+//     </div>
+//   );
 
   const header = (
     <div style={{ display: "flex",flexDirection: "column", alignItems: "flex-start" , gap: AppSpacing.xs, paddingLeft: 8, paddingRight: 8 }}>
