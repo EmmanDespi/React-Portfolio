@@ -44,8 +44,8 @@ export default function HealthCare() {
   //                 Header
   // =======================================
   const avatar = (
-    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-      <div style={{ width: 120, height: 120, padding: 2, boxSizing: "border-box", backgroundColor: p.card, border: `1px solid ${p.ink}`, borderRadius: 8, boxShadow: `4px 4px 0 ${p.shadow}` }}>
+    <div style={{ display: "flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center" }}>
+      <div style={{ width: responsive.isMobile? 100 : 120, height: responsive.isMobile? 100 : 120, padding: 2, boxSizing: "border-box", backgroundColor: p.card, border: `1px solid ${p.ink}`, borderRadius: 8, boxShadow: `4px 4px 0 ${p.shadow}` }}>
         <img src={"/profile.gif"} alt="" style={{ width: "100%", height: "100%", objectFit: "fill", display: "block", borderRadius: 4 }} />
       </div>
     </div>
@@ -53,30 +53,33 @@ export default function HealthCare() {
 
   const nameBlock = (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", paddingTop: AppSpacing.sm, minWidth: 0 }}>
-      <h1 style={{ ...headerText(22, 900), letterSpacing: 2 }}>{info.name}</h1>
+      <h1 style={{ ...headerText(18, 900), letterSpacing: 2 }}>{info.name}</h1>
       <div style={{ ...headerText(14, 700), opacity: 0.7, marginTop: 4 }}>{ROLE_LABELS[role].label} view</div>
     </div>
   );
 
   const dataBlock = (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", marginTop: "auto" }}>
-      <div style={{ ...headerText(16, 500), paddingBottom: 14 }}>{info.place}</div>
-      {info.rows.map(([label, value]) => (
+      <div style={{ ...headerText(16, 500), paddingBottom: 8 }}>{info.place}</div>
+    </div>
+  );
+
+  const header = (
+    <div style={{ display: "flex",flexDirection: "column", alignItems: "flex-start" , gap: AppSpacing.xs, paddingLeft: 8, paddingRight: 8 }}>
+      <div style={{ display: "flex", flexDirection: "row", flex: 1, gap: AppSpacing.sm, minWidth: "100%", }}>
+        {avatar}
+        <div style={{ display: "flex",flexDirection: "column", alignItems: "flex-start" , gap: AppSpacing.xs, paddingLeft: 8, paddingRight: 8 }}>
+            {nameBlock}
+            <div style={{ ...headerText(16, 500), paddingBottom: 8 }}>{info.place}</div>
+        
+      </div>
+    </div>
+    {info.rows.map(([label, value]) => (
         <div key={label} style={{ display: "flex", flexDirection: "row", alignItems: "flex-start" }}>
           <div style={headerText(16, 500)}>{label}:&nbsp;</div>
           <div style={headerText(16, 700)}>{value}</div>
         </div>
       ))}
-    </div>
-  );
-
-  const header = (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: AppSpacing.sm, paddingLeft: 8, paddingRight: 8 }}>
-      {avatar}
-      <div style={{ display: "flex", flexDirection: "column", flex: 2, minWidth: 0, alignSelf: "stretch" }}>
-        {nameBlock}
-        {dataBlock}
-      </div>
     </div>
   );
 
