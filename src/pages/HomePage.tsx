@@ -161,7 +161,7 @@ export default function HomeScreen() {
 
   const ink = isDark ? AppColors.oatmilk : p.ink;
   const stacked = isMobile;;
-  const expWidth = dashboardWidth * (isMobile ? 0.87 : isDesktop ? 0.45 : isTablet ? 0.45 : 0.45);
+  const expWidth = dashboardWidth * (isMobile ? 0.96 : isDesktop ? 0.45 : isTablet ? 0.45 : 0.45);
 
   
 
