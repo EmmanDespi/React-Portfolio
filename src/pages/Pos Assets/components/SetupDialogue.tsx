@@ -108,7 +108,7 @@ export function SetupDialog({ settings: st, onChange, onConnect, status, onClose
             </li>
             <li style={li}>
               Press <strong>Deploy → New deployment</strong>, click the gear and choose <strong>Web app</strong>. Set <strong>Execute as: Me</strong> and
-              <strong> Who has access: Anyone</strong>, then Deploy. Approve the permission prompt. If Google says the app is
+              <strong> Who has access: Only Myself</strong>, then Deploy. Approve the permission prompt. If Google says the app is
               unverified, choose <strong>Advanced → Go to project</strong>. It is your own script.
             </li>
             <li style={li}>
