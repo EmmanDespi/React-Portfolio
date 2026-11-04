@@ -7,7 +7,7 @@ import { AppColors, AppPalette, AppSpacing, NeoButton, NeoTag, WireFrame, useRes
 
 interface Props {
   store: Store;
-  onReading: (kind: "X" | "Z") => Reading;
+  onReading: (kind: "X" | "Z") => Promise<Reading | null>;
   onSendOutbox: () => void;
   notice: string;
   isDark: boolean;
@@ -23,10 +23,11 @@ export function ReportsView({ store: s, onReading, onSendOutbox, notice, isDark 
   const needsSetup = !s.settings.businessName.trim() || !s.settings.tin.trim();
   const queued = s.outbox.filter((o) => o.status === "PENDING" || o.status === "FAILED");
 
-  const closeDay = () => {
-    if (!window.confirm(`Close the day with a Z-reading? ${unclosed} invoice(s) will be locked and can no longer be voided. This cannot be undone.`)) return;
-    setSelId(onReading("Z").id);
-  };
+  const closeDay = async () => {
+  if (!window.confirm(`Close the day with a Z-reading? ${unclosed} invoice(s) will be locked and can no longer be voided. This cannot be undone.`)) return;
+  const r = await onReading("Z");
+  if (r) setSelId(r.id);
+};
 
   const heading: CSSProperties = { color: p.ink, fontSize: 20, fontWeight: 900, letterSpacing: 2.5, margin: `0 0 ${AppSpacing.sm}px` };
   const body: CSSProperties = { color: p.ink, fontSize: 15, margin: 0 };
@@ -52,7 +53,7 @@ export function ReportsView({ store: s, onReading, onSendOutbox, notice, isDark 
           </p>
           {needsSetup && alert("Add your business name and TIN in Settings first.", "warn")}
           <div style={{ ...wrap, marginTop: AppSpacing.sm }}>
-            <NeoButton label="X-reading" fontSize={14} isDark={isDark} color={p.shell} onPressed={needsSetup ? undefined : () => setSelId(onReading("X").id)} />
+            <NeoButton label="X-reading" fontSize={14} isDark={isDark} color={p.shell} onPressed={needsSetup ? undefined : async () => { const r = await onReading("X"); if (r) setSelId(r.id); }}/>
             <NeoButton label="Close day (Z-reading)" fontSize={14} isDark={isDark} color={p.shell} onPressed={needsSetup ? undefined : closeDay} />
           </div>
           <p style={{ ...body, marginTop: AppSpacing.sm }}>Open invoices not yet closed: <strong>{unclosed}</strong></p>
@@ -93,7 +94,7 @@ export function ReportsView({ store: s, onReading, onSendOutbox, notice, isDark 
           <div style={wrap}>
             <NeoButton label="E-journal (.txt)" fontSize={14} isDark={isDark} color={p.shell} onPressed={needsSetup ? undefined : () => download(`e-journal-${stamp}.txt`, buildEJournal(s))} />
             <NeoButton label="Sales book (.csv)" fontSize={14} isDark={isDark} color={p.shell} onPressed={() => download(`sales-book-${stamp}.csv`, salesBookCsv(s.sales), "text/csv")} />
-            <NeoButton label="Backup (.json)" fontSize={14} isDark={isDark} color={p.shell} onPressed={() => download(`pos-backup-${stamp}.json`, JSON.stringify(s, null, 2), "application/json")} />
+            <NeoButton label="Backup (.json)" fontSize={14} isDark={isDark} color={p.shell} onPressed={() => download(`pos-backup-${stamp}.json`, JSON.stringify({ ...s, settings: { ...s.settings, sheetsToken: "" } }, null, 2))} />
           </div>
         </>)}
 

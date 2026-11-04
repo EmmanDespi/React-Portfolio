@@ -1,25 +1,35 @@
 import { EMPTY } from "./types";
 import type { Store } from "./types";
 
-const KEY = "pos-session-v1";
+const KEY = "pos-local-v2";
+const OLD_KEY = "pos-session-v1"; // read once so existing business details carry over
 
 export const uid = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
     : String(Date.now()) + Math.random().toString(16).slice(2);
 
-/** Older saved sessions are merged onto EMPTY so newly added fields exist. */
+type Local = Pick<Store, "sessionId" | "settings" | "cart">;
+
+/**
+ * Only the session id, business/machine/e-invoice/sheet settings and the open cart live here.
+ * Items, sales, readings and the e-invoice queue come from the Google Sheet (see sheets.ts).
+ */
 export function load(): Store {
+  let local: Partial<Local> = {};
   try {
-    const raw = localStorage.getItem(KEY);
-    if (raw) {
-      const p = JSON.parse(raw) as Partial<Store>;
-      return { ...EMPTY, ...p, settings: { ...EMPTY.settings, ...(p.settings ?? {}) } };
-    }
+    const raw = localStorage.getItem(KEY) ?? localStorage.getItem(OLD_KEY);
+    if (raw) local = JSON.parse(raw) as Partial<Local>;
   } catch { /* storage unavailable or corrupt: start blank */ }
-  return EMPTY;
+  return {
+    ...EMPTY,
+    sessionId: local.sessionId || uid(),
+    cart: local.cart ?? [],
+    settings: { ...EMPTY.settings, ...(local.settings ?? {}) },
+  };
 }
 
 export function save(s: Store) {
-  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* ignore */ }
+  const local: Local = { sessionId: s.sessionId, settings: s.settings, cart: s.cart };
+  try { localStorage.setItem(KEY, JSON.stringify(local)); } catch { /* ignore */ }
 }

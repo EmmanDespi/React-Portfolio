@@ -5,7 +5,7 @@ import { TAX_LABEL } from "../tax";
 import { AppColors, AppPalette, AppSpacing, NeoButton, WireFrame } from "../../../theme/AppTheme";
 
 interface Props {
-  onAdd: (n: string, sku: string, p: number, t: TaxType, st: number) => void;
+  onAdd: (n: string, sku: string, p: number, t: TaxType, st: number) => boolean | Promise<boolean>;
   mode: TaxMode;
   isDark: boolean;
 }
@@ -19,15 +19,16 @@ export function AddItemForm({ onAdd, mode, isDark }: Props) {
   const [tax, setTax] = useState<TaxType>("VATABLE");
   const [err, setErr] = useState("");
 
-  const submit = () => {
+  const submit = async () => {
     const pr = Number(price), st = Number(stock || 0);
     if (!name.trim()) return setErr("Enter an item name.");
     if (!(pr > 0)) return setErr("Enter a selling price greater than zero.");
     if (!Number.isInteger(st) || st < 0) return setErr("Opening stock must be a whole number, 0 or more.");
-    onAdd(name, sku, pr, mode === "VAT" ? tax : "VATABLE", st);
+    const ok = await onAdd(name, sku, pr, mode === "VAT" ? tax : "VATABLE", st);
+    if (!ok) return;
     setName(""); setSku(""); setPrice(""); setStock(""); setTax("VATABLE"); setErr("");
   };
-
+  
   const heading: CSSProperties = { color: p.ink, fontSize: 20, fontWeight: 900, letterSpacing: 2.5, margin: `0 0 ${AppSpacing.sm}px` };
   const label: CSSProperties = { display: "block", color: p.ink, fontSize: 13, fontWeight: 700, letterSpacing: 1.5, margin: "0 0 4px" };
   const input: CSSProperties = {

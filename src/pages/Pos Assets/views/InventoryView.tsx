@@ -10,7 +10,7 @@ interface Props {
   search: string;
   setSearch: (v: string) => void;
   mode: TaxMode;
-  onAdd: (...args: any[]) => void;
+  onAdd: (...args: any[]) => Promise<boolean> | boolean;
   onPatch: (...args: any[]) => void;
   onDelete: (...args: any[]) => void;
   isDark: boolean;

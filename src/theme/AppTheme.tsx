@@ -960,3 +960,226 @@ export function NeoDetailDialog<T>({
     </NeoDialog>
   );
 }
+
+export type NeoTone = "ok" | "warn" | "bad" | "info" | "neutral";
+ 
+const TONE_COLOR: Record<NeoTone, string> = {
+  ok: AppColors.lime,
+  warn: AppColors.mustard,
+  bad: AppColors.coral,
+  info: AppColors.oatcream,
+  neutral: AppColors.oatmilk,
+};
+ 
+/** Small status pill (approved, pending, high, low...). */
+export function NeoBadge({ text, tone = "neutral" }: { text: string; tone?: NeoTone }) {
+  return (
+    <span
+      style={{
+        border: `2px solid ${AppColors.ink}`,
+        backgroundColor: TONE_COLOR[tone],
+        color: AppColors.ink,
+        borderRadius: 8,
+        padding: "1px 8px",
+        fontSize: 12,
+        fontWeight: 800,
+        letterSpacing: 1,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {text}
+    </span>
+  );
+}
+ 
+/** Titled panel that groups related content. */
+export function NeoSection({
+  title,
+  action,
+  children,
+  isDark = false,
+}: {
+  title: string;
+  action?: ReactNode;
+  children: ReactNode;
+  isDark?: boolean;
+}) {
+  const p = isDark ? AppPalette.dark : AppPalette.light;
+  return (
+    <div
+      style={{
+        border: `2px solid ${AppColors.ink}`,
+        borderRadius: 8,
+        backgroundColor: p.subcard,
+        boxShadow: `3px 3px 0 ${p.shadow}`,
+        padding: AppSpacing.sm,
+        marginBottom: AppSpacing.md,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: AppSpacing.sm }}>
+        <h3 style={{ margin: 0, color: p.ink, fontSize: 16, fontWeight: 900, letterSpacing: 2 }}>{title}</h3>
+        {action}
+      </div>
+      {children}
+    </div>
+  );
+}
+ 
+/** One row of a record list: title, subtitle, meta line, badge and optional actions. */
+export function NeoListItem({
+  title,
+  subtitle,
+  meta,
+  badge,
+  actions,
+  isDark = false,
+}: {
+  title: string;
+  subtitle?: string;
+  meta?: string;
+  badge?: ReactNode;
+  actions?: ReactNode;
+  isDark?: boolean;
+}) {
+  const p = isDark ? AppPalette.dark : AppPalette.light;
+  return (
+    <div
+      style={{
+        border: `2px solid ${AppColors.ink}`,
+        borderRadius: 8,
+        backgroundColor: p.card,
+        padding: 10,
+        marginBottom: 8,
+        color: p.ink,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontWeight: 800, fontSize: 16 }}>{title}</div>
+          {subtitle && <div style={{ fontWeight: 600, fontSize: 14, marginTop: 2, whiteSpace: "pre-wrap" }}>{subtitle}</div>}
+          {meta && <div style={{ fontSize: 12, opacity: 0.7, marginTop: 4 }}>{meta}</div>}
+        </div>
+        {badge}
+      </div>
+      {actions && <div style={{ marginTop: 10 }}>{actions}</div>}
+    </div>
+  );
+}
+ 
+/** Row of chips that switches between panels. */
+export function NeoTabs<T extends string>({
+  tabs,
+  active,
+  onChange,
+  isDark = false,
+}: {
+  tabs: { id: T; label: string }[];
+  active: T;
+  onChange: (id: T) => void;
+  isDark?: boolean;
+}) {
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: AppSpacing.md }}>
+      {tabs.map((t) => (
+        <NeoChip key={t.id} label={t.label} active={t.id === active} activeColor={AppColors.lime} isDark={isDark} onPressed={() => onChange(t.id)} />
+      ))}
+    </div>
+  );
+}
+ 
+/** Empty state: says what is missing. */
+export function NeoEmpty({ text, isDark = false }: { text: string; isDark?: boolean }) {
+  const p = isDark ? AppPalette.dark : AppPalette.light;
+  return (
+    <div style={{ border: `2px dashed ${p.ink}`, borderRadius: 8, padding: 14, textAlign: "center", color: p.ink, opacity: 0.6, fontWeight: 600, fontSize: 14, marginBottom: 8 }}>
+      {text}
+    </div>
+  );
+}
+ 
+/** Text field / textarea with a label. */
+export function NeoInput({
+  label,
+  value,
+  onChange,
+  placeholder,
+  multiline = false,
+  isDark = false,
+}: {
+  label?: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  multiline?: boolean;
+  isDark?: boolean;
+}) {
+  const p = isDark ? AppPalette.dark : AppPalette.light;
+  const shared: React.CSSProperties = {
+    width: "100%",
+    boxSizing: "border-box",
+    border: `2px solid ${AppColors.ink}`,
+    borderRadius: 8,
+    padding: "8px 10px",
+    backgroundColor: p.card,
+    color: p.ink,
+    fontSize: 15,
+    fontFamily: "inherit",
+  };
+  return (
+    <label style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      {label && <span style={{ color: p.ink, fontWeight: 700, fontSize: 13 }}>{label}</span>}
+      {multiline ? (
+        <textarea rows={3} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} style={{ ...shared, resize: "vertical" }} />
+      ) : (
+        <input value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} style={shared} />
+      )}
+    </label>
+  );
+}
+ 
+/** Button fixed at the upper right that opens a list of options (used as the role switcher). */
+export function NeoFloatingMenu<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+  isDark = false,
+}: {
+  label: string;
+  options: { value: T; label: string; hint?: string }[];
+  value: T;
+  onChange: (v: T) => void;
+  isDark?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const p = isDark ? AppPalette.dark : AppPalette.light;
+  return (
+    <div style={{ position: "fixed", top: 12, right: 16, zIndex: 900, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
+      <NeoButton label={label} fontSize={13} color={AppColors.coral} labelColor={AppColors.ink} isDark={isDark} onPressed={() => setOpen((o) => !o)} />
+      {open && (
+        <div style={{ width: 230, border: `2px solid ${AppColors.ink}`, borderRadius: 8, backgroundColor: p.card, boxShadow: `4px 4px 0 ${p.shadow}`, padding: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+          {options.map((o) => (
+            <button
+              key={o.value}
+              type="button"
+              onClick={() => { onChange(o.value); setOpen(false); }}
+              style={{
+                textAlign: "left",
+                border: `2px solid ${AppColors.ink}`,
+                borderRadius: 8,
+                padding: "6px 10px",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                backgroundColor: o.value === value ? AppColors.lime : p.chip,
+                color: o.value === value ? AppColors.ink : p.ink,
+              }}
+            >
+              <div style={{ fontWeight: 800, fontSize: 14 }}>{o.label}</div>
+              {o.hint && <div style={{ fontSize: 11, opacity: 0.75 }}>{o.hint}</div>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

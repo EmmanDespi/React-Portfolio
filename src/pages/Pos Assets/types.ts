@@ -11,6 +11,8 @@ export interface Sale {
   voided: boolean; voidReason?: string; voidedAt?: string;
   /** Z-reading counter that closed this sale. Closed sales can no longer be voided. */
   zNo?: number;
+  /** Browser session that created the sale (stored in the sheet for traceability). */
+  sessionId?: string;
 }
 
 export interface Settings {
@@ -20,6 +22,8 @@ export interface Settings {
   eInvoiceEnabled: boolean;
   /** Your own backend endpoint that relays to the BIR. Never put BIR credentials in the browser. */
   eInvoiceEndpoint: string;
+  /** Google Apps Script web app link (ends in /exec) and its access token. Kept on this device only. */
+  sheetsUrl: string; sheetsToken: string;
 }
 
 /** An X-reading (snapshot, closes nothing) or Z-reading (closes the day). */
@@ -37,7 +41,13 @@ export interface OutboxItem {
   saleId: string; no: string; status: OutboxStatus; attempts: number; lastError?: string; sentAt?: string;
 }
 
+/**
+ * In memory the app still works with one Store.
+ * Saved on this device (localStorage): sessionId, settings, cart.
+ * Saved in the Google Sheet: items, sales, readings, outbox (nextNo is derived from sales).
+ */
 export interface Store {
+  sessionId: string;
   settings: Settings; items: Item[]; sales: Sale[];
   cart: { itemId: string; qty: number }[]; nextNo: number;
   readings: Reading[];  // newest first
@@ -45,9 +55,11 @@ export interface Store {
 }
 
 export const EMPTY: Store = {
+  sessionId: "",
   settings: {
     businessName: "", tin: "", address: "", taxMode: "VAT",
     minNo: "", serialNo: "", ptuNo: "", eInvoiceEnabled: false, eInvoiceEndpoint: "",
+    sheetsUrl: "", sheetsToken: "",
   },
   items: [], sales: [], cart: [], nextNo: 1, readings: [], outbox: [],
 };

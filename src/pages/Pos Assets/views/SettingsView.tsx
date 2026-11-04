@@ -2,9 +2,18 @@ import type { CSSProperties, ReactNode } from "react";
 import type { Settings, TaxMode } from "../types";
 import { AppColors, AppPalette, AppSpacing, NeoButton, WireFrame } from "../../../theme/AppTheme";
 
-interface Props { settings: Settings; onChange: (patch: Partial<Settings>) => void; onErase: () => void; isDark: boolean }
+interface Props {
+  settings: Settings;
+  onChange: (patch: Partial<Settings>) => void;
+  onErase: () => void;
+  /** True once the Google Sheet has been read successfully. */
+  connected: boolean;
+  /** Reads the sheet again using the link and token currently entered. */
+  onReload: () => void;
+  isDark: boolean;
+}
 
-export function SettingsView({ settings: st, onChange, onErase, isDark }: Props) {
+export function SettingsView({ settings: st, onChange, onErase, connected, onReload, isDark }: Props) {
   const p = isDark ? AppPalette.dark : AppPalette.light;
 
   const heading: CSSProperties = { color: p.ink, fontSize: 20, fontWeight: 900, letterSpacing: 2.5, margin: `0 0 ${AppSpacing.sm}px` };
@@ -19,13 +28,29 @@ export function SettingsView({ settings: st, onChange, onErase, isDark }: Props)
   const field = (text: string, control: ReactNode) => (
     <label style={{ display: "block", minWidth: 0 }}><span style={label}>{text}</span>{control}</label>
   );
-  const text = (k: "businessName" | "tin" | "address" | "minNo" | "serialNo" | "ptuNo" | "eInvoiceEndpoint") => (
+  const text = (k: "businessName" | "tin" | "address" | "minNo" | "serialNo" | "ptuNo" | "eInvoiceEndpoint" | "sheetsUrl") => (
     <input style={input} value={st[k]} onChange={(e) => onChange({ [k]: e.target.value })} />
   );
   const stack: CSSProperties = { display: "grid", gap: AppSpacing.sm, marginTop: AppSpacing.sm };
 
   return (
     <WireFrame color={p.card} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8} style={{ maxWidth: 560 }}>
+      <h2 style={heading}>Google Sheet</h2>
+      <p style={body}>
+        Items, sales, invoice lines, readings and the e-invoice queue are saved in your sheet, one tab each
+        (Items, Sales, SaleLines, Readings, Outbox). This device only keeps the details on this page and the open cart.
+      </p>
+      <div style={stack}>
+        {field("Web app link (https://script.google.com/.../exec)", text("sheetsUrl"))}
+        {field("Access token",
+          <input style={input} type="password" autoComplete="off" value={st.sheetsToken} onChange={(e) => onChange({ sheetsToken: e.target.value })} />)}
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: AppSpacing.sm, marginTop: AppSpacing.sm }}>
+        <NeoButton label="Connect / reload from sheet" fontSize={14} isDark={isDark} color={p.shell} onPressed={onReload} />
+        <span role="status" style={{ color: p.ink, fontWeight: 800, fontSize: 14 }}>{connected ? "Connected" : "Not connected"}</span>
+      </div>
+      <p style={small}>Selling and editing are blocked until the sheet is connected, so nothing is shown that was not saved.</p>
+      {rule}
       <h2 style={heading}>Business details</h2>
       <p style={body}>These print on every invoice. Sales are blocked until the name and TIN are filled in.</p>
       <div style={stack}>
@@ -57,7 +82,8 @@ export function SettingsView({ settings: st, onChange, onErase, isDark }: Props)
       {field("Your relay endpoint (https://...)", text("eInvoiceEndpoint"))}
       <p style={small}>Point this at your own backend, which keeps the BIR credentials and does the actual transmission.</p>
       {rule}
-      <NeoButton label="Erase everything" fontSize={14} isDark={isDark} icon={<span aria-hidden>✖</span>} onPressed={onErase} style={{ display: "inline-block" }} />
+      <NeoButton label="Erase details on this device" fontSize={14} isDark={isDark} icon={<span aria-hidden>✖</span>} onPressed={onErase} style={{ display: "inline-block" }} />
+      <p style={small}>Clears the settings above and the cart from this browser. Your Google Sheet is not touched.</p>
     </WireFrame>
   );
 }
