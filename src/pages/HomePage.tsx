@@ -5,7 +5,6 @@ import {
   AppPalette,
   AppSpacing,
   NeoAvatar,
-  NeoButton,
   NeoChip,
   NeoSwitch,
   useResponsive,
@@ -425,7 +424,6 @@ export default function HomeScreen() {
     </div>
   );
 
-  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
   // ---------- dashboard ----------
