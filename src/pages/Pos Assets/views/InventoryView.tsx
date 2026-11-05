@@ -1,5 +1,6 @@
-import type { Item, TaxMode } from "../types";
-import { AppPalette, AppSpacing, WireFrame } from "../../../theme/AppTheme";
+import type { Item, TaxMode, TaxType } from "../types";
+import { AppPalette, AppSpacing } from "../../../theme/tokens";
+import { WireFrame } from "../../../theme/AppTheme";
 import { AddItemForm } from "../components/AddItemForm";
 import { InventoryRow } from "../components/InventoryRow";
 import type { CSSProperties } from "react";
@@ -10,9 +11,9 @@ interface Props {
   search: string;
   setSearch: (v: string) => void;
   mode: TaxMode;
-  onAdd: (...args: any[]) => Promise<boolean> | boolean;
-  onPatch: (...args: any[]) => void;
-  onDelete: (...args: any[]) => void;
+  onAdd: (name: string, sku: string, price: number, taxType: TaxType, stock: number) => boolean | Promise<boolean>;
+  onPatch: (id: string, patch: Partial<Item>) => void;
+  onDelete: (id: string) => void;
   isDark: boolean;
 }
 

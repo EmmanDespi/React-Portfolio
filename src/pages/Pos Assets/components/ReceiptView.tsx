@@ -1,7 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { Sale, Settings } from "../types";
 import { peso, r2 } from "../tax";
-import { AppColors, AppSpacing, WireFrame } from "../../../theme/AppTheme";
+import { AppColors, AppSpacing } from "../../../theme/tokens";
+import { WireFrame } from "../../../theme/AppTheme";
 
 /** Receipt paper stays white with dark monospace text in both themes. */
 export function ReceiptView({ sale, settings, isDark }: { sale: Sale; settings: Settings; isDark: boolean }) {

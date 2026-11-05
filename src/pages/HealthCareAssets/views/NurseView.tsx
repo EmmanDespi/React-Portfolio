@@ -1,8 +1,10 @@
 // NURSE VIEW: observe, collect, enter raw results, request HMO access.
 // No diagnosing, prescribing, analyzing or signing (see permissions.ts).
 import { useState } from "react";
-import { AppColors, NeoBadge, NeoButton, NeoEmpty, NeoListItem, NeoSection } from "../../../theme/AppTheme";
-import { ActionForm, ErrorText, useAction } from "../components/ActionForm";
+import { NeoBadge, NeoButton, NeoEmpty, NeoListItem, NeoSection } from "../../../theme/AppTheme";
+import { AppColors } from "../../../theme/tokens";
+import { ActionForm, ErrorText } from "../components/ActionForm";
+import { useAction } from "../components/actionFormHelpers";
 import { PatientPicker } from "../components/PatientPicker";
 import { RecordTabs } from "../components/RecordTabs";
 import { selectRecord } from "../selectors";

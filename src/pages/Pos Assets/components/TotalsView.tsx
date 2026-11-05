@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import type { TaxMode, Totals } from "../types";
 import { peso } from "../tax";
-import { AppPalette, NeoRows } from "../../../theme/AppTheme";
+import { AppPalette } from "../../../theme/tokens";
+import { NeoRows } from "../../../theme/AppTheme";
 
 export function TotalsView({ totals, mode, isDark }: { totals: Totals; mode: TaxMode; isDark: boolean }) {
   const p = isDark ? AppPalette.dark : AppPalette.light;

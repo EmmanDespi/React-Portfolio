@@ -5,20 +5,7 @@ import { NeoBadge, NeoEmpty, NeoListItem, NeoRows, NeoSection } from "../../../t
 import { useDb } from "../store";
 import { selectRecord, staffName } from "../selectors";
 import { fmtDate, fmtMoney } from "../utils";
-
-export type RecordSection = "overview" | "vitals" | "labs" | "meds" | "history" | "consults" | "certs" | "hmo";
-
-export const SECTION_LABELS: Record<RecordSection, string> = {
-  overview: "Overview",
-  vitals: "Vitals",
-  labs: "Lab results",
-  meds: "Medications",
-  history: "Sickness history",
-  consults: "Consultations",
-  certs: "Certificates",
-  hmo: "HMO",
-};
-
+import type { RecordSection } from "./recordSections";
 
 export function RecordPanel({ section, patientId, isDark }: { section: RecordSection; patientId: string; isDark: boolean }) {
   const db = useDb();

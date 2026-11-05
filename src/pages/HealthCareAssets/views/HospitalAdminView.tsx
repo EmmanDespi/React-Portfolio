@@ -1,6 +1,8 @@
 // HOSPITAL ADMIN VIEW: staff access and the audit trail. No patient records here.
-import { AppColors, NeoBadge, NeoButton, NeoListItem, NeoRows, NeoSection } from "../../../theme/AppTheme";
-import { ErrorText, useAction } from "../components/ActionForm";
+import { NeoBadge, NeoButton, NeoListItem, NeoRows, NeoSection } from "../../../theme/AppTheme";
+import { AppColors } from "../../../theme/tokens";
+import { ErrorText } from "../components/ActionForm";
+import { useAction } from "../components/actionFormHelpers";
 import { useDb } from "../store";
 import { setStaffActive } from "../services/adminService";
 import type { Actor } from "../types";

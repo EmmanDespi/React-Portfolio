@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { Settings } from "../types";
 import { APPS_SCRIPT, TOKEN_PLACEHOLDER } from "../SetupScript";
-import { AppColors, AppPalette, AppSpacing, NeoButton, WireFrame } from "../../../theme/AppTheme";
+import { AppColors, AppPalette, AppSpacing } from "../../../theme/tokens";
+import { NeoButton, WireFrame } from "../../../theme/AppTheme";
 
 interface Props {
   settings: Settings;

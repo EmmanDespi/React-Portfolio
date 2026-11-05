@@ -1,7 +1,9 @@
 import type { CSSProperties, } from "react";
 import type { Item, Line, Sale, Settings, Totals } from "../types";
 import { peso, r2 } from "../tax";
-import { AppColors, AppPalette, AppSpacing, NeoButton, WireFrame, useResponsive } from "../../../theme/AppTheme";
+import { AppColors, AppPalette, AppSpacing } from "../../../theme/tokens";
+import { useResponsive } from "../../../theme/responsive";
+import { NeoButton, WireFrame } from "../../../theme/AppTheme";
 import { TotalsView } from "../components/TotalsView";
 import { ReceiptView } from "../components/ReceiptView";
 

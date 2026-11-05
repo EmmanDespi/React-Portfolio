@@ -1,9 +1,6 @@
-import { useMemo, useState, type CSSProperties } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  AppColors,
-  AppPalette,
-  AppSpacing,
   NeoButton,
   NeoChip,
   NeoDialog,
@@ -11,9 +8,10 @@ import {
   NeoRows,
   NeoStatBar,
   NeoTag,
-  useResponsive,
   WireFrameFrosted,
 } from "../theme/AppTheme";
+import { AppColors, AppPalette, AppSpacing } from "../theme/tokens";
+import { useResponsive } from "../theme/responsive";
 
 import shadowSoldier from "../assets/shadows/shadow-soldier.png";
 import shadowArcher from "../assets/shadows/shadow-archer.png";
@@ -30,8 +28,9 @@ import kaisel from "../assets/shadows/kaisel.png";
 import bellion from "../assets/shadows/bellion.png";
 import beru from "../assets/shadows/beru.png";
 import kamish from "../assets/shadows/kamish.png";
-import { useAppTheme } from "../theme/ThemeContext";
+import { useAppTheme } from "../theme/useAppTheme";
 import { FloatingButton } from "../theme/FloatingButton";
+import { dotBackground } from "../theme/background";
 
 type ViewMode = "grid" | "list";
 
@@ -354,22 +353,21 @@ export default function DataScreen() {
       >
         {/* Header */}
         <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 12, marginBottom: AppSpacing.sm }}>
-          <NeoButton label="Back" color={AppColors.coral} onPressed={() => navigate("/")} />
           <h1
             style={{
               color: isDark ? AppColors.oatmilk : AppColors.ink,
               fontWeight: 900,
               letterSpacing: 1.5,
-              fontSize: responsive.isDesktop ? 38 : 24,
+              fontSize: responsive.isDesktop ? 32 : 22,
               margin: 0,
             }}
           >
-            Shadow Army
+            Solo Leveling: Shadow Army Catalog
           </h1>
         </div>
 
         {/* Controls */}
-        <WireFrameFrosted isDark={isDark} frost={0.1}>
+        <WireFrameFrosted isDark={isDark} frost={0.05}>
           <div style={{ display: "flex", flexDirection: "column", gap: AppSpacing.sm }}>
             {/* Rank tabs */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -471,7 +469,7 @@ export default function DataScreen() {
 
         {/* Empty state */}
         {visibleItems.length === 0 && (
-          <WireFrameFrosted isDark={isDark} frost={0.1}>
+          <WireFrameFrosted isDark={isDark} frost={0.5}>
             <div style={{ color: palette.ink, fontWeight: 700, textAlign: "center" }}>
               No shadows match your search or filters.
             </div>
@@ -581,14 +579,3 @@ export default function DataScreen() {
     </div>
   );
 }
-
-export const dotBackground = (
-  bg: string,
-  dot: string,
-  gap = 26,
-  size = 2
-): CSSProperties => ({
-  backgroundColor: bg,
-  backgroundImage: `radial-gradient(${dot} ${size}px, transparent ${size}px)`,
-  backgroundSize: `${gap}px ${gap}px`,
-});

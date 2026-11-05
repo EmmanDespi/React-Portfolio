@@ -1,6 +1,8 @@
 import { useState, type CSSProperties } from "react";
-import { useAppTheme } from "../theme/ThemeContext";
-import { AppColors, AppPalette, AppSpacing, NeoButton, NeoFloatingMenu, useResponsive, WireFrameFrosted } from "../theme/AppTheme";
+import { useAppTheme } from "../theme/useAppTheme";
+import { AppColors, AppPalette, AppSpacing } from "../theme/tokens";
+import { useResponsive } from "../theme/responsive";
+import { NeoButton, NeoFloatingMenu, WireFrameFrosted } from "../theme/AppTheme";
 import { useDb } from "./HealthCareAssets/store";
 import { describeActor } from "./HealthCareAssets/selectors";
 import { DEMO_ACTORS, ROLE_LABELS } from "./HealthCareAssets/data/demoActors";
@@ -12,6 +14,7 @@ import HmoView from "./HealthCareAssets/views/HmoView";
 import HospitalAdminView from "./HealthCareAssets/views/HospitalAdminView";
 import { FloatingButton } from "../theme/FloatingButton";
 import { useNavigate } from "react-router-dom";
+import { dotBackground } from "../theme/background";
 
 const VIEWS = {
   patient: PatientView,
@@ -133,9 +136,3 @@ export default function HealthCare() {
     </div>
   );
 }
-
-export const dotBackground = (bg: string, dot: string, gap = 26, size = 2): CSSProperties => ({
-  backgroundColor: bg,
-  backgroundImage: `radial-gradient(${dot} ${size}px, transparent ${size}px)`,
-  backgroundSize: `${gap}px ${gap}px`,
-});

@@ -1,7 +1,9 @@
 // HMO VIEW: sees only its own members and their authorization requests.
 // SERVERLESS: this screen becomes the HMO's own portal, or a webhook consumer on their side.
-import { AppColors, NeoBadge, NeoEmpty, NeoListItem, NeoSection } from "../../../theme/AppTheme";
-import { ActionForm, ErrorText, useAction } from "../components/ActionForm";
+import { NeoBadge, NeoEmpty, NeoListItem, NeoSection } from "../../../theme/AppTheme";
+import { AppColors } from "../../../theme/tokens";
+import { ActionForm, ErrorText } from "../components/ActionForm";
+import { useAction } from "../components/actionFormHelpers";
 import { useDb } from "../store";
 import { staffName } from "../selectors";
 import { respondAuthorization } from "../services/hmoService";

@@ -1,7 +1,8 @@
 // Tabs + panel for the shared read-only sections, with room for role-specific extra tabs.
 import { useState, type ReactNode } from "react";
 import { NeoTabs } from "../../../theme/AppTheme";
-import { RecordPanel, SECTION_LABELS, type RecordSection } from "./RecordPanel";
+import { RecordPanel } from "./RecordPanel";
+import { SECTION_LABELS, type RecordSection } from "./recordSections";
 
 export function RecordTabs({
   patientId,

@@ -1,17 +1,16 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  AppColors,
-  AppPalette,
-  AppSpacing,
   NeoAvatar,
   NeoChip,
   NeoSwitch,
-  useResponsive,
   WireFrame,
   WireFrameFrosted,
 } from "../theme/AppTheme";
-import { useAppTheme } from "../theme/ThemeContext";
+import { AppColors, AppPalette, AppSpacing } from "../theme/tokens";
+import { useResponsive } from "../theme/responsive";
+import { useAppTheme } from "../theme/useAppTheme";
+import { dotBackground } from "../theme/background";
 
 // ==========================================
 // DATA
@@ -61,18 +60,18 @@ const projects = [
     image: createProjectPreview("Point of Sale", "#ef6249", "Checkout"),
   },
   {
-    title: "Shadow Catalog",
-    subtitle: "Searchable character catalog",
-    description: "Browse and filter a shadow collection with detailed profiles, stats, and grid or list views.",
-    path: "/data",
-    image: createProjectPreview("Shadow Catalog", "#d7f34a", "Collection"),
-  },
-  {
     title: "Healthcare",
     subtitle: "Healthcare profile dashboard",
     description: "A healthcare-themed dashboard presenting member details and policy information.",
     path: "/healthcare",
     image: createProjectPreview("Healthcare", "#38515a", "Member profile"),
+  },
+  {
+    title: "Shadow Catalog",
+    subtitle: "Searchable character catalog",
+    description: "Browse and filter a shadow collection with detailed profiles, stats, and grid or list views.",
+    path: "/data",
+    image: createProjectPreview("Shadow Catalog", "#d7f34a", "Collection"),
   },
 ];
 
@@ -504,14 +503,3 @@ export default function HomeScreen() {
     </div>
   );
 }
-
-export const dotBackground = (
-  bg: string,
-  dot: string,
-  gap = 26,
-  size = 2
-): CSSProperties => ({
-  backgroundColor: bg,
-  backgroundImage: `radial-gradient(${dot} ${size}px, transparent ${size}px)`,
-  backgroundSize: `${gap}px ${gap}px`,
-});

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { EMPTY } from "./Pos Assets/types";
 import type { Item, Line, OutboxItem, Reading, Sale, Settings, Store, TaxType } from "./Pos Assets/types";
@@ -15,8 +15,11 @@ import { ReportsView } from "./Pos Assets/views/ReportsView";
 import { SettingsView } from "./Pos Assets/views/SettingsView";
 import { SetupDialog } from "./Pos Assets/components/SetupDialogue";
 import { FloatingButton } from "../theme/FloatingButton";
-import { AppColors, AppPalette, AppSpacing, NeoButton, WireFrameFrosted, useResponsive } from "../theme/AppTheme";
-import { useAppTheme } from "../theme/ThemeContext";
+import { AppColors, AppPalette, AppSpacing } from "../theme/tokens";
+import { useResponsive } from "../theme/responsive";
+import { NeoButton, WireFrameFrosted } from "../theme/AppTheme";
+import { useAppTheme } from "../theme/useAppTheme";
+import { dotBackground } from "../theme/background";
 
 type Tab = "sell" | "inventory" | "sales" | "reports" | "settings";
 const TABS: [Tab, string][] = [["sell", "Sell"], ["inventory", "Inventory"], ["sales", "Sales"], ["reports", "Reports"], ["settings", "Settings"]];
@@ -62,12 +65,15 @@ export default function POSPage() {
   const hasLink = !!(s.settings.sheetsUrl.trim() && s.settings.sheetsToken.trim());
   const unsynced = useMemo(() => compactOps(s.pending).length, [s.pending]);
   const sRef = useRef(s);
-  sRef.current = s;
-
-  useEffect(() => { setSaveFailed(!save(s)); }, [s]);
   useEffect(() => {
-    if (s.cart.length === 0) setCash("");
-  }, [s.cart.length]);
+    sRef.current = s;
+  }, [s]);
+
+  useEffect(() => {
+    const failed = !save(s);
+    const frame = window.requestAnimationFrame(() => setSaveFailed(failed));
+    return () => window.cancelAnimationFrame(frame);
+  }, [s]);
 
   /* ── Google Sheet sync: upload everything queued, then read the sheet back ── */
   async function syncNow(): Promise<boolean> {
@@ -104,7 +110,9 @@ export default function POSPage() {
     }
   }
   const syncRef = useRef(syncNow);
-  syncRef.current = syncNow;
+  useEffect(() => {
+    syncRef.current = syncNow;
+  });
 
   // On open: sync if a sheet is configured.
   useEffect(() => {
@@ -149,12 +157,15 @@ export default function POSPage() {
       const next: Item = { ...cur, ...patch };
       return withOps({ ...p, items: p.items.map((i) => (i.id === id ? next : i)) }, [put(SHEET.items, itemRow(next, sid))]);
     });
-  const deleteItem = (id: string) =>
+  const deleteItem = (id: string) => {
+    if (s.cart.length === 1 && s.cart[0].itemId === id) setCash("");
     setS((p) => withOps({ ...p, items: p.items.filter((i) => i.id !== id), cart: p.cart.filter((c) => c.itemId !== id) }, [del(SHEET.items, id)]));
+  };
 
   /* ── cart (this device only, never synced) ── */
   const inCart = (id: string) => s.cart.find((c) => c.itemId === id)?.qty ?? 0;
-  const setQty = (id: string, qty: number) =>
+  const setQty = (id: string, qty: number) => {
+    if (qty <= 0 && s.cart.length === 1 && s.cart[0].itemId === id) setCash("");
     setS((p) => {
       const it = p.items.find((i) => i.id === id);
       if (!it) return p;
@@ -166,6 +177,7 @@ export default function POSPage() {
       const exists = p.cart.some((c) => c.itemId === id);
       return { ...p, cart: exists ? p.cart.map((c) => (c.itemId === id ? { ...c, qty: q } : c)) : [...p.cart, { itemId: id, qty: q }] };
     });
+  };
 
   /* ── checkout: saves the sale, its lines, the new stock levels and the e-invoice queue entry on this device, and queues them for the sheet ── */
   function checkout() {
@@ -382,7 +394,7 @@ export default function POSPage() {
           {tab === "sell" && (
             <SellView items={s.items} search={search} setSearch={setSearch} inCart={inCart} setQty={setQty}
               lines={lines} totals={totals} settings={s.settings} cash={cash} setCash={setCash} msg={msg}
-              onCheckout={checkout} onClearCart={() => setS((q) => ({ ...q, cart: [] }))} lastSale={lastSale} isDark={isDark} />
+              onCheckout={checkout} onClearCart={() => { setS((q) => ({ ...q, cart: [] })); setCash(""); }} lastSale={lastSale} isDark={isDark} />
           )}
           {tab === "inventory" && (
             <InventoryView
@@ -414,13 +426,3 @@ export default function POSPage() {
     </div>
   );
 }
-export const dotBackground = (
-  bg: string,
-  dot: string,
-  gap = 26,
-  size = 2
-): CSSProperties => ({
-  backgroundColor: bg,
-  backgroundImage: `radial-gradient(${dot} ${size}px, transparent ${size}px)`,
-  backgroundSize: `${gap}px ${gap}px`,
-});

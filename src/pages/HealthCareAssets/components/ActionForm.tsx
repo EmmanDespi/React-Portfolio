@@ -1,35 +1,13 @@
 // Small form + action helpers shared by every role view.
 // Services throw readable errors (permissions, validation); these show them inline.
 import { useState } from "react";
-import { AppColors, NeoButton, NeoChip, NeoInput } from "../../../theme/AppTheme";
-
-export function useAction() {
-  const [error, setError] = useState<string>();
-  const run = async (fn: () => unknown): Promise<boolean> => {
-    try {
-      setError(undefined);
-      await fn();
-      return true;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong.");
-      return false;
-    }
-  };
-  return { error, run };
-}
+import { AppColors } from "../../../theme/tokens";
+import { NeoButton, NeoChip, NeoInput } from "../../../theme/AppTheme";
+import { useAction, type FormField } from "./actionFormHelpers";
 
 export function ErrorText({ text }: { text?: string }) {
   if (!text) return null;
   return <div role="alert" style={{ color: AppColors.coral, fontWeight: 800, fontSize: 14, marginTop: 6 }}>{text}</div>;
-}
-
-export interface FormField {
-  key: string;
-  label: string;
-  placeholder?: string;
-  multiline?: boolean;
-  options?: string[]; // shows chips instead of a text box
-  defaultValue?: string;
 }
 
 export function ActionForm({

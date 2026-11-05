@@ -1,6 +1,7 @@
 // Lets clinicians choose which patient they are working with.
 // SERVERLESS: replace `patients` with a searchable, paginated API query (GET /patients?search=).
-import { AppColors, NeoChip, NeoSection } from "../../../theme/AppTheme";
+import { NeoChip, NeoSection } from "../../../theme/AppTheme";
+import { AppColors } from "../../../theme/tokens";
 import type { Patient } from "../types";
 
 export function PatientPicker({ patients, value, onChange, isDark }: { patients: Patient[]; value: string; onChange: (id: string) => void; isDark: boolean }) {

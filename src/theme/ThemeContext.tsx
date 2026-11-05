@@ -1,12 +1,6 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { AppPalette } from "./AppTheme";
-
-type ThemeContextValue = {
-  isDark: boolean;
-  setIsDark: (value: boolean) => void;
-};
-
-const ThemeContext = createContext<ThemeContextValue | null>(null);
+import { useEffect, useState, type ReactNode } from "react";
+import { AppPalette } from "./tokens";
+import { ThemeContext } from "./themeContext";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [isDark, setIsDark] = useState(false);
@@ -22,10 +16,4 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       {children}
     </ThemeContext.Provider>
   );
-}
-
-export function useAppTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useAppTheme must be used inside <ThemeProvider>");
-  return ctx;
 }

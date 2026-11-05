@@ -2,7 +2,8 @@ import { useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import type { TaxMode, TaxType } from "../types";
 import { TAX_LABEL } from "../tax";
-import { AppColors, AppPalette, AppSpacing, NeoButton, WireFrame } from "../../../theme/AppTheme";
+import { AppColors, AppPalette, AppSpacing } from "../../../theme/tokens";
+import { NeoButton, WireFrame } from "../../../theme/AppTheme";
 
 interface Props {
   onAdd: (n: string, sku: string, p: number, t: TaxType, st: number) => boolean | Promise<boolean>;

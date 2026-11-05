@@ -3,7 +3,9 @@ import type { CSSProperties, ReactNode } from "react";
 import type { Reading, Store } from "../types";
 import { buildEJournal, download, readingText, salesBookCsv } from "../reports";
 import { toPayload } from "../einvoice";
-import { AppColors, AppPalette, AppSpacing, NeoButton, NeoTag, WireFrame, useResponsive } from "../../../theme/AppTheme";
+import { AppColors, AppPalette, AppSpacing } from "../../../theme/tokens";
+import { useResponsive } from "../../../theme/responsive";
+import { NeoButton, NeoTag, WireFrame } from "../../../theme/AppTheme";
 
 interface Props {
   store: Store;
