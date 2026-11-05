@@ -6,7 +6,7 @@ import { calc, r2 } from "./Pos Assets/tax";
 import { load, save, uid } from "./Pos Assets/storage";
 import { buildReading } from "./Pos Assets/reports";
 import { httpTransmitter, toPayload } from "./Pos Assets/einvoice";
-import { SHEET, del, itemRow, lineRows, loadAll, outboxRow, put, readingRow, saleRow, sendOps } from "./Pos Assets/sheets";
+import { SHEET, compactOps, del, itemRow, lineRows, loadAll, outboxRow, put, readingRow, saleRow, sendOps } from "./Pos Assets/sheets";
 import type { Op } from "./Pos Assets/sheets";
 import { SellView } from "./Pos Assets/views/SellView";
 import { InventoryView } from "./Pos Assets/views/InventoryView";
@@ -23,10 +23,17 @@ const TABS: [Tab, string][] = [["sell", "Sell"], ["inventory", "Inventory"], ["s
 
 const errText = (e: unknown) => (e instanceof Error ? e.message : "Failed");
 
+const SYNC_EVERY_MS = 60 * 60 * 1000; // auto sync: every hour
+const CHUNK = 100;                    // ops per request to Apps Script
+
+/** Appends sheet writes to the unsynced queue. Every change goes through this, whether or not a sheet is connected. */
+const withOps = (p: Store, ops: Op[]): Store => ({ ...p, pending: [...p.pending, ...ops] });
+
 /**
  * Shell only: owns the state and every action that changes it. Screens live in ./views.
- * Saved on this device: session id, settings, cart. Saved in the Google Sheet: items, sales, readings, e-invoice queue.
- * Each sheet action writes to the sheet FIRST and only updates the screen once the sheet accepted it.
+ * Local-first: every action saves on this device immediately and queues its sheet writes in `pending`.
+ * syncNow() uploads the queue to the Google Sheet (when connected) and then reads the sheet back.
+ * It runs on connect, every hour, on the Sync button, and after a Z-reading.
  */
 export default function POSPage() {
   const [s, setS] = useState<Store>(load);
@@ -37,13 +44,13 @@ export default function POSPage() {
   const [msg, setMsg] = useState("");
   const [notice, setNotice] = useState("");
   const [lastId, setLastId] = useState<string | null>(null);
-  const [sync, setSync] = useState("");       // status / error line about the Google Sheet
-  const [loaded, setLoaded] = useState(false); // true once the sheet has been read successfully
-  const busy = useRef(false);
-  // Starts true for a returning browser that already has a link and token, so the setup dialog doesn't flash while loading.
-  const [loading, setLoading] = useState(() => !!(s.settings.sheetsUrl.trim() && s.settings.sheetsToken.trim()));
-  const [setupDismissed, setSetupDismissed] = useState(false); // not saved: the dialog returns on the next visit until connected
-  const [setupOpen, setSetupOpen] = useState(false);           // opened on demand with the (i) button
+  const [sync, setSync] = useState("");       // progress / error line about the Google Sheet
+  const [loaded, setLoaded] = useState(false); // true when the last sync with the sheet succeeded
+  const [syncing, setSyncing] = useState(false);
+  const [syncTick, setSyncTick] = useState(0); // bump to request a sync after the next render (state is then up to date)
+  const [saveFailed, setSaveFailed] = useState(false);
+  const syncBusy = useRef(false);
+  const [setupOpen, setSetupOpen] = useState(() => !(s.settings.sheetsUrl.trim() && s.settings.sheetsToken.trim())); // first visit without a sheet: offer setup (can be dismissed)
 
   // Shared theme preference controlled by the HomePage NeoSwitch.
   const { isDark } = useAppTheme();
@@ -52,62 +59,69 @@ export default function POSPage() {
   const shellWidth = responsive.isDesktop ? responsive.width * 0.7 : responsive.dashboardWidth;
 
   const sid = s.sessionId;
-  const connected = !!(s.settings.sheetsUrl.trim() && s.settings.sheetsToken.trim());
+  const hasLink = !!(s.settings.sheetsUrl.trim() && s.settings.sheetsToken.trim());
+  const unsynced = useMemo(() => compactOps(s.pending).length, [s.pending]);
+  const sRef = useRef(s);
+  sRef.current = s;
 
-  useEffect(() => { save(s); }, [s]);
+  useEffect(() => { setSaveFailed(!save(s)); }, [s]);
   useEffect(() => {
     if (s.cart.length === 0) setCash("");
   }, [s.cart.length]);
 
-  /* ── Google Sheet: read ── */
-  async function refresh(): Promise<boolean> {
-    if (!connected) {
+  /* ── Google Sheet sync: upload everything queued, then read the sheet back ── */
+  async function syncNow(): Promise<boolean> {
+    const st = sRef.current.settings;
+    if (!(st.sheetsUrl.trim() && st.sheetsToken.trim())) {
       setLoaded(false);
-      setSync("Not connected. Paste your Google Sheet web app link and token in Settings.");
+      setSync("Not connected. Paste your Google Sheet web app link and token in Settings. Your data stays on this device until then.");
       return false;
     }
-    setSync("Loading from your Google Sheet...");
+    if (syncBusy.current) return false;
+    syncBusy.current = true;
+    setSyncing(true);
+    setSync("Syncing with your Google Sheet...");
     try {
-      const d = await loadAll(s.settings);
-      setS((q) => ({ ...q, ...d }));
+      const queue = sRef.current.pending;
+      const ops = compactOps(queue);
+      for (let i = 0; i < ops.length; i += CHUNK) await sendOps(st, ops.slice(i, i + CHUNK));
+      // Everything in `queue` is now in the sheet. Changes made while syncing were appended after it and stay queued.
+      if (queue.length) setS((q) => ({ ...q, pending: q.pending.slice(queue.length) }));
+      const d = await loadAll(st);
+      const at = new Date().toISOString();
+      // Only replace local data with the sheet's copy when nothing newer is waiting, so nothing is overwritten.
+      setS((q) => (q.pending.length ? { ...q, lastSyncAt: at } : { ...q, ...d, lastSyncAt: at }));
       setLoaded(true);
       setSync("");
       return true;
     } catch (e) {
       setLoaded(false);
-      setSync(`Could not load the sheet: ${errText(e)}`);
+      setSync(`Sync failed: ${errText(e)}. Your data is safe on this device and will upload on the next sync.`);
       return false;
     } finally {
-      setLoading(false);
+      syncBusy.current = false;
+      setSyncing(false);
     }
   }
+  const syncRef = useRef(syncNow);
+  syncRef.current = syncNow;
+
+  // On open: sync if a sheet is configured.
   useEffect(() => {
-    void refresh();
+    if (hasLink) void syncRef.current();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  /* ── Google Sheet: write. Returns an error message, or null when the sheet accepted every op. ── */
-  async function commit(ops: Op[]): Promise<string | null> {
-    if (!loaded) {
-      const m = "Not connected to your Google Sheet. Check Settings, then press Connect / reload.";
-      setSync(m);
-      return m;
-    }
-    if (busy.current) return "Still saving the previous change. Try again in a moment.";
-    busy.current = true;
-    setSync("Saving to your Google Sheet...");
-    try {
-      await sendOps(s.settings, ops);
-      setSync("");
-      return null;
-    } catch (e) {
-      const m = errText(e);
-      setSync(`Not saved to the sheet: ${m}`);
-      return m;
-    } finally {
-      busy.current = false;
-    }
-  }
+  // Auto sync every hour while the page is open and a sheet is configured.
+  useEffect(() => {
+    if (!hasLink) return;
+    const t = window.setInterval(() => { void syncRef.current(); }, SYNC_EVERY_MS);
+    return () => window.clearInterval(t);
+  }, [hasLink]);
+  // Requested syncs (after a Z-reading).
+  useEffect(() => {
+    if (syncTick > 0 && hasLink) void syncRef.current();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncTick]);
 
   const lines: Line[] = useMemo(
     () =>
@@ -119,29 +133,26 @@ export default function POSPage() {
   );
   const totals = useMemo(() => calc(lines, s.settings.taxMode), [lines, s.settings.taxMode]);
 
-  /* ── settings (this device only) ── */
+  /* ── settings (kept on this device, never synced) ── */
   const patchSettings = (patch: Partial<Settings>) => setS((p) => ({ ...p, settings: { ...p.settings, ...patch } }));
 
   /* ── inventory (Items tab) ── */
-  const addItem = async (name: string, sku: string, price: number, taxType: TaxType, stock: number): Promise<boolean> => {
+  const addItem = (name: string, sku: string, price: number, taxType: TaxType, stock: number): boolean => {
     const item: Item = { id: uid(), name: name.trim(), sku: sku.trim(), price: r2(price), taxType, stock };
-    if (await commit([put(SHEET.items, itemRow(item, sid))])) return false;
-    setS((p) => ({ ...p, items: [...p.items, item] }));
+    setS((p) => withOps({ ...p, items: [...p.items, item] }, [put(SHEET.items, itemRow(item, sid))]));
     return true;
   };
-  const patchItem = async (id: string, patch: Partial<Item>) => {
-    const cur = s.items.find((i) => i.id === id);
-    if (!cur) return;
-    const next: Item = { ...cur, ...patch };
-    if (await commit([put(SHEET.items, itemRow(next, sid))])) return;
-    setS((p) => ({ ...p, items: p.items.map((i) => (i.id === id ? next : i)) }));
-  };
-  const deleteItem = async (id: string) => {
-    if (await commit([del(SHEET.items, id)])) return;
-    setS((p) => ({ ...p, items: p.items.filter((i) => i.id !== id), cart: p.cart.filter((c) => c.itemId !== id) }));
-  };
+  const patchItem = (id: string, patch: Partial<Item>) =>
+    setS((p) => {
+      const cur = p.items.find((i) => i.id === id);
+      if (!cur) return p;
+      const next: Item = { ...cur, ...patch };
+      return withOps({ ...p, items: p.items.map((i) => (i.id === id ? next : i)) }, [put(SHEET.items, itemRow(next, sid))]);
+    });
+  const deleteItem = (id: string) =>
+    setS((p) => withOps({ ...p, items: p.items.filter((i) => i.id !== id), cart: p.cart.filter((c) => c.itemId !== id) }, [del(SHEET.items, id)]));
 
-  /* ── cart (this device only) ── */
+  /* ── cart (this device only, never synced) ── */
   const inCart = (id: string) => s.cart.find((c) => c.itemId === id)?.qty ?? 0;
   const setQty = (id: string, qty: number) =>
     setS((p) => {
@@ -156,8 +167,8 @@ export default function POSPage() {
       return { ...p, cart: exists ? p.cart.map((c) => (c.itemId === id ? { ...c, qty: q } : c)) : [...p.cart, { itemId: id, qty: q }] };
     });
 
-  /* ── checkout: one batch writes the sale, its lines, the new stock levels and the e-invoice queue entry ── */
-  async function checkout() {
+  /* ── checkout: saves the sale, its lines, the new stock levels and the e-invoice queue entry on this device, and queues them for the sheet ── */
+  function checkout() {
     setMsg("");
     const { businessName, tin } = s.settings;
     if (!businessName.trim() || !tin.trim()) return setMsg("Add your business name and TIN in Settings before selling.");
@@ -174,29 +185,23 @@ export default function POSPage() {
       .map((it) => ({ ...it, stock: it.stock - (lines.find((l) => l.itemId === it.id)?.qty ?? 0) }));
 
     const ops: Op[] = [
-      put(SHEET.sales, saleRow(sale, sid), "no"), // "no" must be unique: stops two tills issuing the same invoice number
+      put(SHEET.sales, saleRow(sale, sid), "no"), // "no" must be unique in the sheet: a clash is reported at sync time
       ...lineRows(sale).map((r) => put(SHEET.lines, r)),
       ...updated.map((it) => put(SHEET.items, itemRow(it, sid))),
       ...(entry ? [put(SHEET.outbox, outboxRow(entry, sid))] : []),
     ];
-    const err = await commit(ops);
-    if (err) {
-      if (/already exists/i.test(err)) void refresh(); // another device issued that number: pull its sales
-      return setMsg(`Sale not saved. ${err}`);
-    }
-
-    setS((p) => ({
+    setS((p) => withOps({
       ...p,
       items: p.items.map((it) => updated.find((u) => u.id === it.id) ?? it),
       sales: [sale, ...p.sales], cart: [], nextNo: p.nextNo + 1,
       outbox: entry ? [entry, ...p.outbox] : p.outbox,
-    }));
+    }, ops));
     setCash("");
     setLastId(sale.id);
   }
 
   /* A void keeps the record, returns the stock, and cancels any unsent e-invoice. Closed days can't be voided. */
-  async function voidSale(sale: Sale) {
+  function voidSale(sale: Sale) {
     if (sale.zNo !== undefined) return;
     const reason = window.prompt(`Reason for voiding invoice ${sale.no}?`);
     if (!reason || !reason.trim()) return;
@@ -206,35 +211,31 @@ export default function POSPage() {
       .map((it) => ({ ...it, stock: it.stock + (sale.lines.find((l) => l.itemId === it.id)?.qty ?? 0) }));
     const cancelled: OutboxItem[] = s.outbox.filter((o) => o.saleId === sale.id && o.status !== "SENT").map((o) => ({ ...o, status: "CANCELLED" }));
 
-    const err = await commit([
-      put(SHEET.sales, saleRow(voided, sid)),
-      ...restored.map((it) => put(SHEET.items, itemRow(it, sid))),
-      ...cancelled.map((o) => put(SHEET.outbox, outboxRow(o, sid))),
-    ]);
-    if (err) return;
-
-    setS((p) => ({
+    setS((p) => withOps({
       ...p,
       items: p.items.map((it) => restored.find((r) => r.id === it.id) ?? it),
       sales: p.sales.map((x) => (x.id === sale.id ? voided : x)),
       outbox: p.outbox.map((o) => cancelled.find((c) => c.saleId === o.saleId) ?? o),
-    }));
+    }, [
+      put(SHEET.sales, saleRow(voided, sid)),
+      ...restored.map((it) => put(SHEET.items, itemRow(it, sid))),
+      ...cancelled.map((o) => put(SHEET.outbox, outboxRow(o, sid))),
+    ]));
   }
 
-  /* ── X / Z readings (Readings tab; a Z-reading also stamps the closed sales in the Sales tab) ── */
+  /* ── X / Z readings. A Z-reading stamps the closed sales, then triggers a sync to the sheet. ── */
   async function takeReading(kind: "X" | "Z"): Promise<Reading | null> {
     const r = buildReading(kind, s);
     const closing = kind === "Z" ? s.sales.filter((x) => x.zNo === undefined).map((x) => ({ ...x, zNo: r.counter })) : [];
-    const err = await commit([
-      put(SHEET.readings, readingRow(r, sid)),
-      ...closing.map((x) => put(SHEET.sales, saleRow(x, sid))),
-    ]);
-    if (err) return null;
-    setS((p) => ({
+    setS((p) => withOps({
       ...p,
       readings: [r, ...p.readings],
       sales: kind === "Z" ? p.sales.map((x) => (x.zNo === undefined ? { ...x, zNo: r.counter } : x)) : p.sales,
-    }));
+    }, [
+      put(SHEET.readings, readingRow(r, sid)),
+      ...closing.map((x) => put(SHEET.sales, saleRow(x, sid))),
+    ]));
+    if (kind === "Z") setSyncTick((n) => n + 1);
     return r;
   }
 
@@ -257,8 +258,7 @@ export default function POSPage() {
       } catch (e) {
         next = { ...o, status: "FAILED", attempts: o.attempts + 1, lastError: errText(e) };
       }
-      setS((p) => ({ ...p, outbox: p.outbox.map((x) => (x.saleId === o.saleId ? next : x)) }));
-      await commit([put(SHEET.outbox, outboxRow(next, sid))]);
+      setS((p) => withOps({ ...p, outbox: p.outbox.map((x) => (x.saleId === o.saleId ? next : x)) }, [put(SHEET.outbox, outboxRow(next, sid))]));
     }
     setNotice(`${ok} of ${todo.length} sent.`);
   }
@@ -285,10 +285,10 @@ export default function POSPage() {
         backgroundColor: p.background,
       }}
     >
-      {(setupOpen || (!loaded && !loading && !setupDismissed)) && (
+      {setupOpen && (
         <SetupDialog settings={s.settings} onChange={patchSettings} status={sync} connected={loaded} isDark={isDark}
-          onConnect={async () => { if (await refresh()) setSetupOpen(false); }}
-          onClose={() => { setSetupDismissed(true); setSetupOpen(false); }} />
+          onConnect={async () => { if (await syncNow()) setSetupOpen(false); }}
+          onClose={() => setSetupOpen(false)} />
       )}
       <FloatingButton
         onClick={() => setIsOpen(!isOpen)}
@@ -333,7 +333,7 @@ export default function POSPage() {
               </button>
             </div>
             <div style={{ color: p.ink, fontSize: 16, fontWeight: 500, letterSpacing: 2 }}>
-              {s.settings.taxMode === "VAT" ? "VAT-registered" : "Non-VAT"} • saved in Google Sheets
+              {s.settings.taxMode === "VAT" ? "VAT-registered" : "Non-VAT"} • {!hasLink ? "saved on this device only" : unsynced > 0 ? "saved here, sync pending" : "synced with Google Sheets"}
             </div>
           </div>
           {/* <NeoSwitch value={isDark} onValueChange={setIsDark} /> */}
@@ -344,6 +344,26 @@ export default function POSPage() {
             margin: `${AppSpacing.sm}px 8px 0`, padding: "8px 12px", border: `2px solid ${AppColors.ink}`, borderRadius: 8,
             backgroundColor: AppColors.mustard, color: AppColors.ink, fontWeight: 700, fontSize: 14,
           }}>{sync}</div>
+        )}
+
+        {(saveFailed || !hasLink || (unsynced > 0 && !syncing)) && (
+          <div role="alert" style={{
+            margin: `${AppSpacing.sm}px 8px 0`, padding: "8px 12px", border: `2px solid ${AppColors.ink}`, borderRadius: 8,
+            backgroundColor: !hasLink || saveFailed ? AppColors.coral : AppColors.mustard, color: AppColors.ink, fontWeight: 700, fontSize: 14,
+            display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: AppSpacing.sm,
+          }}>
+            <span>
+              {saveFailed
+                ? "This browser could not save your data (storage full or blocked). Download a backup in Reports and free up space."
+                : !hasLink
+                  ? `Google Sheets is not set up. All data is stored only on this device${unsynced ? ` (${unsynced} record(s))` : ""}. Clearing browser data will erase it. Connect a sheet and everything here is uploaded automatically.`
+                  : `${unsynced} record(s) are saved on this device but not in your Google Sheet yet. They sync every hour, when you close the day, or when you press Sync now.`}
+            </span>
+            {!saveFailed && (
+              <NeoButton label={hasLink ? "Sync now" : "Set up"} fontSize={14} isDark={isDark} color={p.shell}
+                onPressed={hasLink ? () => { void syncNow(); } : () => setSetupOpen(true)} />
+            )}
+          </div>
         )}
 
         <div style={{ height: AppSpacing.md }} />
@@ -380,11 +400,12 @@ export default function POSPage() {
           {tab === "reports" && <ReportsView store={s} onReading={takeReading} onSendOutbox={sendOutbox} notice={notice} isDark={isDark} />}
           {tab === "settings" && (
             <SettingsView settings={s.settings} onChange={patchSettings} isDark={isDark}
-              connected={loaded} onReload={refresh}
+              connected={loaded} onSync={() => { void syncNow(); }} syncing={syncing} unsynced={unsynced} lastSyncAt={s.lastSyncAt}
               onErase={() => {
-                if (window.confirm("Erase the business details, settings and cart saved on this device? Your Google Sheet is not touched.")) {
+                const warn = unsynced > 0 ? `${unsynced} record(s) have NOT been synced to your Google Sheet and will be lost permanently. ` : "";
+                if (window.confirm(`${warn}Erase all data, settings and the cart saved on this device? Data already synced stays in your Google Sheet.`)) {
                   setS((q) => ({ ...EMPTY, sessionId: q.sessionId }));
-                  setLoaded(false); setSetupDismissed(false); setLastId(null); setCash(""); setNotice(""); setSync("");
+                  setLoaded(false); setLastId(null); setCash(""); setNotice(""); setSync("");
                 }
               }} />
           )}

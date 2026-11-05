@@ -239,7 +239,7 @@ interface WireFrameFrostedProps {
   minHeight?: number;
   padding?: number;
   margin?: number;
-  color?: string;          // hex like "#ffffff" (6 digits). Falls back to the palette card color
+  color?: string;
   borderRadius?: number;
   borderWidth?: number;
   borderColor?: string;
@@ -271,7 +271,7 @@ export const WireFrameFrosted: React.FC<WireFrameFrostedProps> = ({
   color,
   borderColor,
   isDark = true,
-  frost = 0.5,
+  frost = 0.3,
   blur,
   style,
 }) => {

@@ -1,4 +1,5 @@
-import type { Item, Line, OutboxItem, Reading, Sale, Settings, Store, TaxMode, TaxType } from "./types";
+import type { Item, Line, Op, OutboxItem, Reading, Sale, Settings, Store, TaxMode, TaxType } from "./types";
+export type { Op };
 
 /**
  * Talks to the Google Apps Script web app in Code.gs, which is bound to YOUR sheet.
@@ -8,12 +9,31 @@ import type { Item, Line, OutboxItem, Reading, Sale, Settings, Store, TaxMode, T
 export const SHEET = { items: "Items", sales: "Sales", lines: "SaleLines", readings: "Readings", outbox: "Outbox" } as const;
 
 type R = Record<string, string>;
-export type Op =
-  | { op: "put"; sheet: string; row: R; unique?: string } // insert or update by row.id; `unique` = column that must not repeat
-  | { op: "del"; sheet: string; id: string };
 
 export const put = (sheet: string, row: R, unique?: string): Op => ({ op: "put", sheet, row, ...(unique ? { unique } : {}) });
 export const del = (sheet: string, id: string): Op => ({ op: "del", sheet, id });
+
+/**
+ * Squashes a queue of writes: for each row only the newest write is kept (a row edited 5 times is sent once).
+ * Safe to resend: puts replace by id and deleting a missing row does nothing.
+ */
+export function compactOps(ops: Op[]): Op[] {
+  const out: (Op | null)[] = [];
+  const at = new Map<string, number>();
+  for (const o of ops) {
+    const key = `${o.sheet}|${o.op === "put" ? o.row.id : o.id}`;
+    const prevIdx = at.get(key);
+    let next: Op = o;
+    if (prevIdx !== undefined) {
+      const prev = out[prevIdx];
+      if (prev && prev.op === "put" && o.op === "put" && prev.unique && !o.unique) next = { ...o, unique: prev.unique };
+      out[prevIdx] = null;
+    }
+    at.set(key, out.length);
+    out.push(next);
+  }
+  return out.filter((x): x is Op => x !== null);
+}
 
 /* ───────── transport ───────── */
 

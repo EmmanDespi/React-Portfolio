@@ -6,14 +6,19 @@ interface Props {
   settings: Settings;
   onChange: (patch: Partial<Settings>) => void;
   onErase: () => void;
-  /** True once the Google Sheet has been read successfully. */
+  /** True when the last sync with the Google Sheet succeeded. */
   connected: boolean;
-  /** Reads the sheet again using the link and token currently entered. */
-  onReload: () => void;
+  /** Uploads unsynced changes, then reads the sheet, using the link and token currently entered. */
+  onSync: () => void;
+  syncing: boolean;
+  /** Records changed on this device that the sheet doesn't have yet. */
+  unsynced: number;
+  /** ISO time of the last successful sync, or "". */
+  lastSyncAt: string;
   isDark: boolean;
 }
 
-export function SettingsView({ settings: st, onChange, onErase, connected, onReload, isDark }: Props) {
+export function SettingsView({ settings: st, onChange, onErase, connected, onSync, syncing, unsynced, lastSyncAt, isDark }: Props) {
   const p = isDark ? AppPalette.dark : AppPalette.light;
 
   const heading: CSSProperties = { color: p.ink, fontSize: 20, fontWeight: 900, letterSpacing: 2.5, margin: `0 0 ${AppSpacing.sm}px` };
@@ -37,8 +42,9 @@ export function SettingsView({ settings: st, onChange, onErase, connected, onRel
     <WireFrame color={p.card} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8} style={{ maxWidth: 560 }}>
       <h2 style={heading}>Google Sheet</h2>
       <p style={body}>
-        Items, sales, invoice lines, readings and the e-invoice queue are saved in your sheet, one tab each
-        (Items, Sales, SaleLines, Readings, Outbox). This device only keeps the details on this page and the open cart.
+        Everything is saved on this device first. Once a sheet is connected, items, sales, invoice lines, readings and the
+        e-invoice queue are also synced to it, one tab each (Items, Sales, SaleLines, Readings, Outbox).
+        Sync runs automatically every hour and whenever you close the day with a Z-reading.
       </p>
       <div style={stack}>
         {field("Web app link (https://script.google.com/.../exec)", text("sheetsUrl"))}
@@ -46,10 +52,14 @@ export function SettingsView({ settings: st, onChange, onErase, connected, onRel
           <input style={input} type="password" autoComplete="off" value={st.sheetsToken} onChange={(e) => onChange({ sheetsToken: e.target.value })} />)}
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: AppSpacing.sm, marginTop: AppSpacing.sm }}>
-        <NeoButton label="Connect / reload from sheet" fontSize={14} isDark={isDark} color={p.shell} onPressed={onReload} />
+        <NeoButton label={syncing ? "Syncing..." : "Sync now"} fontSize={14} isDark={isDark} color={p.shell} onPressed={syncing ? undefined : onSync} />
         <span role="status" style={{ color: p.ink, fontWeight: 800, fontSize: 14 }}>{connected ? "Connected" : "Not connected"}</span>
       </div>
-      <p style={small}>Selling and editing are blocked until the sheet is connected, so nothing is shown that was not saved.</p>
+      <p style={small}>
+        {unsynced > 0 ? `${unsynced} record(s) on this device are not in the sheet yet. ` : "Nothing waiting to sync. "}
+        {lastSyncAt ? `Last synced ${new Date(lastSyncAt).toLocaleString("en-PH")}.` : "Never synced."}
+      </p>
+      <p style={small}>Until the sheet is connected, all data stays on this device only. Connect it and everything here is uploaded.</p>
       {rule}
       <h2 style={heading}>Business details</h2>
       <p style={body}>These print on every invoice. Sales are blocked until the name and TIN are filled in.</p>
@@ -82,8 +92,8 @@ export function SettingsView({ settings: st, onChange, onErase, connected, onRel
       {field("Your relay endpoint (https://...)", text("eInvoiceEndpoint"))}
       <p style={small}>Point this at your own backend, which keeps the BIR credentials and does the actual transmission.</p>
       {rule}
-      <NeoButton label="Erase details on this device" fontSize={14} isDark={isDark} icon={<span aria-hidden>✖</span>} onPressed={onErase} style={{ display: "inline-block" }} />
-      <p style={small}>Clears the settings above and the cart from this browser. Your Google Sheet is not touched.</p>
+      <NeoButton label="Erase data on this device" fontSize={14} isDark={isDark} icon={<span aria-hidden>✖</span>} onPressed={onErase} style={{ display: "inline-block" }} />
+      <p style={small}>Clears the settings, the cart and all data saved in this browser. Anything already synced stays in your Google Sheet; anything not yet synced is lost.</p>
     </WireFrame>
   );
 }

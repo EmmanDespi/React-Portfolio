@@ -74,7 +74,7 @@ export function SetupDialog({ settings: st, onChange, onConnect, status, onClose
           <p style={body}>
             {connected
               ? "Your sheet is connected. Use this guide to set up another sheet or script, or to change the link and token."
-              : "This POS saves items, sales, readings and the e-invoice queue in a Google Sheet you own. This browser has no connection yet (first visit, or its data was cleared), so set one up below."}
+              : "This POS saves items, sales, readings and the e-invoice queue in a Google Sheet you own. This browser has no connection yet (first visit, or its data was cleared), so set one up below. Until then everything is saved on this device only, and it uploads to the sheet automatically once you connect."}
           </p>
           {!connected && <p style={small}>Already did this before? Skip to step 5 and paste your existing link and token.</p>}
 

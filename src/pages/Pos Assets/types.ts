@@ -15,6 +15,12 @@ export interface Sale {
   sessionId?: string;
 }
 
+export type SheetRow = Record<string, string>;
+/** One queued write to the Google Sheet. put = insert/update by row.id (`unique` = column that must not repeat), del = delete by id. */
+export type Op =
+  | { op: "put"; sheet: string; row: SheetRow; unique?: string }
+  | { op: "del"; sheet: string; id: string };
+
 export interface Settings {
   businessName: string; tin: string; address: string; taxMode: TaxMode;
   /** Filled in after BIR accreditation / PTU. Printed on receipts and readings. */
@@ -43,8 +49,8 @@ export interface OutboxItem {
 
 /**
  * In memory the app still works with one Store.
- * Saved on this device (localStorage): sessionId, settings, cart.
- * Saved in the Google Sheet: items, sales, readings, outbox (nextNo is derived from sales).
+ * Everything is saved on this device (localStorage) first, including the queue of unsynced changes (`pending`).
+ * When a Google Sheet is connected, `pending` is uploaded to it (see sheets.ts) and the sheet is read back.
  */
 export interface Store {
   sessionId: string;
@@ -52,6 +58,10 @@ export interface Store {
   cart: { itemId: string; qty: number }[]; nextNo: number;
   readings: Reading[];  // newest first
   outbox: OutboxItem[]; // newest first
+  /** Changes made on this device that the Google Sheet has not accepted yet. Emptied by a successful sync. */
+  pending: Op[];
+  /** ISO time of the last successful sync ("" = never). */
+  lastSyncAt: string;
 }
 
 export const EMPTY: Store = {
@@ -61,5 +71,5 @@ export const EMPTY: Store = {
     minNo: "", serialNo: "", ptuNo: "", eInvoiceEnabled: false, eInvoiceEndpoint: "",
     sheetsUrl: "", sheetsToken: "",
   },
-  items: [], sales: [], cart: [], nextNo: 1, readings: [], outbox: [],
+  items: [], sales: [], cart: [], nextNo: 1, readings: [], outbox: [], pending: [], lastSyncAt: "",
 };

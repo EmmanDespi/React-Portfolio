@@ -94,7 +94,7 @@ export function ReportsView({ store: s, onReading, onSendOutbox, notice, isDark 
           <div style={wrap}>
             <NeoButton label="E-journal (.txt)" fontSize={14} isDark={isDark} color={p.shell} onPressed={needsSetup ? undefined : () => download(`e-journal-${stamp}.txt`, buildEJournal(s))} />
             <NeoButton label="Sales book (.csv)" fontSize={14} isDark={isDark} color={p.shell} onPressed={() => download(`sales-book-${stamp}.csv`, salesBookCsv(s.sales), "text/csv")} />
-            <NeoButton label="Backup (.json)" fontSize={14} isDark={isDark} color={p.shell} onPressed={() => download(`pos-backup-${stamp}.json`, JSON.stringify({ ...s, settings: { ...s.settings, sheetsToken: "" } }, null, 2))} />
+            <NeoButton label="Backup (.json)" fontSize={14} isDark={isDark} color={p.shell} onPressed={() => download(`pos-backup-${stamp}.json`, JSON.stringify({ ...s, pending: [], settings: { ...s.settings, sheetsToken: "" } }, null, 2))} />
           </div>
         </>)}
 
