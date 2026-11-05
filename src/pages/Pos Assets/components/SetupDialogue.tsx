@@ -4,6 +4,7 @@ import type { Settings } from "../types";
 import { APPS_SCRIPT, TOKEN_PLACEHOLDER } from "../SetupScript";
 import { AppColors, AppPalette, AppSpacing } from "../../../theme/tokens";
 import { NeoButton, WireFrame } from "../../../theme/AppTheme";
+import { useResponsive } from "../../../theme/responsive";
 
 interface Props {
   settings: Settings;
@@ -29,6 +30,8 @@ export function SetupDialog({ settings: st, onChange, onConnect, status, onClose
   const p = isDark ? AppPalette.dark : AppPalette.light;
   const box = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
+
+  const responsive = useResponsive();
 
   useEffect(() => {
     box.current?.focus();
@@ -69,8 +72,8 @@ export function SetupDialog({ settings: st, onChange, onConnect, status, onClose
       style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
     >
       <div ref={box} role="dialog" aria-modal="true" aria-labelledby="setup-title" tabIndex={-1}
-        style={{ width: "100%", height: "100%", maxHeight: "120vh", overflowY: "auto", outline: "none" }}>
-        <WireFrame color={p.card} isDark={isDark} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>
+        style={{ width: responsive.isMobile ? "100%" : "60%", height: "100%", maxHeight: "120vh", overflowY: "auto", outline: "none" }}>
+        <WireFrame color={p.card} isDark={isDark} shadowOffset={0} height="auto" margin={0} padding={AppSpacing.sm} borderRadius={8}>
           <h2 id="setup-title" style={heading}>{connected ? "Google Sheet setup" : "Connect your Google Sheet"}</h2>
           <p style={body}>
             {connected

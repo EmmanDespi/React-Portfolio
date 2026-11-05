@@ -17,6 +17,7 @@ interface WireFrameProps {
   borderRadius?: number;
   borderWidth?: number;
   borderColor?: string;
+  shadowOffset?: number;
   isDark?: boolean;
   style?: React.CSSProperties;
 }
@@ -30,12 +31,12 @@ export const WireFrame: React.FC<WireFrameProps> = ({
   margin = 4,
   borderRadius = 6,
   borderWidth = 2,
+  shadowOffset = 4,
   color,
   borderColor = AppColors.ink,
   isDark = true,
   style,
 }) => {
-  const shadowOffset = 4;
   const p = isDark ? AppPalette.dark : AppPalette.light;
   return (
     <div style={{ position: "relative", width, minHeight, margin, ...style }}>

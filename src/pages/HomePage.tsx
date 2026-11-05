@@ -30,26 +30,6 @@ const frontEndTechs = [
   "Flutter", "HTML", "CSS", "React.js", "React Native",
   "SwiftUI", "Vite", "Tailwind CSS", "Material UI",
 ];
-const createProjectPreview = (title: string, accent: string, label: string) => {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270">
-      <rect width="480" height="270" rx="18" fill="#171713"/>
-      <rect x="14" y="14" width="452" height="242" rx="12" fill="#f3efe2"/>
-      <rect x="14" y="14" width="452" height="34" rx="12" fill="#e2dacb"/>
-      <circle cx="34" cy="31" r="5" fill="#ef6249"/>
-      <circle cx="52" cy="31" r="5" fill="#ffbf00"/>
-      <circle cx="70" cy="31" r="5" fill="#d7f34a"/>
-      <rect x="30" y="64" width="110" height="176" rx="8" fill="#211832"/>
-      <rect x="158" y="66" width="184" height="18" rx="6" fill="${accent}"/>
-      <rect x="158" y="96" width="276" height="8" rx="4" fill="#c2a178"/>
-      <rect x="158" y="116" width="226" height="8" rx="4" fill="#c2a178"/>
-      <rect x="158" y="148" width="126" height="76" rx="8" fill="#ff fefa"/>
-      <rect x="296" y="148" width="138" height="76" rx="8" fill="#e2dacb"/>
-      <text x="158" y="178" fill="#171713" font-family="Arial, sans-serif" font-size="16" font-weight="700">${label}</text>
-      <text x="158" y="242" fill="#171713" font-family="Arial, sans-serif" font-size="14" font-weight="700">${title}</text>
-    </svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-};
 
 const projects = [
   {
@@ -57,26 +37,26 @@ const projects = [
     subtitle: "Retail sales and inventory",
     description: "A point-of-sale experience for managing products, inventory, sales, reports, and store settings.",
     path: "/pos",
-    image: createProjectPreview("Point of Sale", "#ef6249", "Checkout"),
+    image: "/screenshots/pos.png",
   },
   {
     title: "Healthcare",
     subtitle: "Healthcare profile dashboard",
     description: "A healthcare-themed dashboard presenting member details and policy information.",
     path: "/healthcare",
-    image: createProjectPreview("Healthcare", "#38515a", "Member profile"),
+    image: "/screenshots/healthcare.png",
   },
   {
     title: "Shadow Catalog",
     subtitle: "Searchable character catalog",
     description: "Browse and filter a shadow collection with detailed profiles, stats, and grid or list views.",
     path: "/data",
-    image: createProjectPreview("Shadow Catalog", "#d7f34a", "Collection"),
+    image: "/screenshots/catalog.png",
   },
 ];
 
 const backEndTechs = [
-  "Node.js", "Firebase", "REST API", "Python", "MySQL", "MongoDB", "Git",
+  "Node.js", "Next.js", "Redis", "Firebase", "REST API", "Python", "MySQL", "MongoDB", "Git",
   "Docker", "Kubernetes", "Data Pipelines (ETL/ELT)", "Azure",
 ];
 
@@ -86,7 +66,7 @@ const cloudTools = [
 ];
 
 const languages = [
-  "C", "C++", "C#", "Go Lang", "JavaScript", "Python", "Java", "Dart", "Swift", "Kotlin",
+  "C", "C++", "C#", "Go Lang", "JavaScript", "TypeScript", "Python", "Java", "Dart", "Swift", "Kotlin",
 ];
 
 // ==========================================
