@@ -260,9 +260,12 @@ class TournamentController {
     if (this.matches.length === 0) return false;
     if (this.isSwiss) return this.swissComplete;
     const finals = this.matches.filter(
-      (m) => !this.matches.some((o) => o.group === m.group && o.round === m.round + 1),
+      (m) => !this.isThird(m) && !this.matches.some((o) => o.group === m.group && o.round === m.round + 1),
     );
-    return finals.length > 0 && finals.every((m) => m.winnerId !== null);
+    const thirdsDone = this.matches
+      .filter((m) => this.isThird(m))
+      .every((t) => t.winnerId !== null || this.thirdDormant(t));
+    return finals.length > 0 && finals.every((m) => m.winnerId !== null) && thirdsDone;
   }
   get automaticByeCount() {
     if (this.players.length < 2) return 0;
@@ -275,7 +278,7 @@ class TournamentController {
   matchesForGroup(group: number): Match[][] {
     const grouped = new Map<number, Match[]>();
     for (const m of this.matches) {
-      if (m.group !== group) continue;
+      if (m.group !== group || this.isThird(m)) continue;
       if (!grouped.has(m.round)) grouped.set(m.round, []);
       grouped.get(m.round)!.push(m);
     }
@@ -296,6 +299,26 @@ class TournamentController {
       (n) => n.group === match.group && n.round === match.round + 1 && n.slot === Math.floor(match.slot / 2),
     );
   }
+
+  /* ── 3rd place helpers ── */
+  isThird = (m: Match) => m.id.endsWith("-third");
+  thirdPlaceMatch(group: number): Match | undefined {
+    return this.matches.find((m) => m.group === group && this.isThird(m));
+  }
+  private semisOf(third: Match) {
+    return this.matches.filter((m) => m.group === third.group && m.round === third.round - 1);
+  }
+  /** True when the 3rd place match can never be played (e.g. a semifinal was a bye). */
+  private thirdDormant(third: Match) {
+    const semis = this.semisOf(third);
+    return (
+      third.winnerId === null &&
+      !(third.playerA !== null && third.playerB !== null) &&
+      semis.length > 0 &&
+      semis.every((s) => s.winnerId !== null)
+    );
+  }
+
   private hasPlayers(m: Match) {
     return m.playerA !== null || m.playerB !== null;
   }
@@ -307,6 +330,10 @@ class TournamentController {
     return !!f0 && !!f1 && this.branchResolved(f0) && this.branchResolved(f1);
   };
   hasVisibleContent = (match: Match): boolean => {
+    if (this.isThird(match)) {
+      if (match.winnerId !== null) return true;
+      return !this.thirdDormant(match) && this.semisOf(match).some((s) => s.playerA !== null && s.playerB !== null);
+    }
     if (this.hasPlayers(match) || match.winnerId !== null) return true;
     if (match.round === 0) return false;
     const [f0, f1] = this.feeders(match);
@@ -314,6 +341,7 @@ class TournamentController {
   };
   isMatchReady = (match: Match): boolean => {
     if (match.winnerId !== null) return false;
+    if (this.isThird(match)) return match.playerA !== null && match.playerB !== null;
     if (match.playerA !== null && match.playerB !== null) return true;
     const [f0, f1] = this.feeders(match);
     const list = [f0, f1].filter((f): f is Match => !!f);
@@ -529,6 +557,11 @@ class TournamentController {
         }
       }
 
+      // 3rd place match: same round as the final, fed by the semifinal losers.
+      if (roundCount >= 2) {
+        this.matches.push(newMatch(`g${group}-third`, group, roundCount - 1, 1));
+      }
+
       const at = (round: number, slot: number) =>
         this.matches.find((m) => m.group === group && m.round === round && m.slot === slot);
 
@@ -727,6 +760,10 @@ class TournamentController {
     this.history.push(`${this.name(playerId)} won ${match.id}${loser === null ? " by bye" : ` over ${this.name(loser)}`}.`);
     const next = this.nextMatch(match);
     if (next) this.setSlot(next, match.slot % 2 === 0 ? 0 : 1, playerId);
+    const third = this.thirdPlaceMatch(match.group);
+    if (third && loser !== null && match.round === third.round - 1) {
+      this.setSlot(third, match.slot % 2 === 0 ? 0 : 1, loser);
+    }
     this.resolveByes();
     this.syncActiveStageSnapshot();
     this.notify();
@@ -830,7 +867,7 @@ class TournamentController {
   get finalWinners(): Player[] {
     const result: Player[] = [];
     for (const group of this.groups) {
-      const gm = this.matches.filter((m) => m.group === group);
+      const gm = this.matches.filter((m) => m.group === group && !this.isThird(m));
       if (gm.length === 0) continue;
       const final = gm.reduce((a, b) => (a.round > b.round ? a : b));
       const winner = this.playerById(final.winnerId);
@@ -857,6 +894,7 @@ class TournamentController {
       changed = false;
       for (const match of this.matches) {
         if (match.winnerId !== null) continue;
+        if (this.isThird(match)) continue;
         const [f0, f1] = this.feeders(match);
 
         if (match.round > 0 && f0 && f1) {
@@ -1180,6 +1218,7 @@ function StatusBadge({ status }: { status: Status }) {
 const SLOT_HEIGHT = 30;
 const MATCH_HEIGHT = 66; // 2 slots + 2px divider + 4px border
 const MATCH_UNIT = 76; // card height + vertical gap
+const THIRD_PLACE_GAP_UNITS = 2; // 3rd place card sits this many match-units below the final
 
 function PlayerSlot({
   ctrl, match, slot, onSwissResult,
@@ -1310,9 +1349,10 @@ const roundLabel = (count: number) =>
   count === 1 ? "Final" : count === 2 ? "Semifinals" : count === 4 ? "Quarterfinals" : `Round of ${count * 2}`;
 
 function RoundColumn({
-  ctrl, round, roundIndex, allRounds, onSwissResult,
+  ctrl, round, roundIndex, allRounds, onSwissResult, third,
 }: {
-  ctrl: TournamentController; round: Match[]; roundIndex: number; allRounds: Match[][]; onSwissResult: (m: Match) => void;
+  ctrl: TournamentController; round: Match[]; roundIndex: number; allRounds: Match[][];
+  onSwissResult: (m: Match) => void; third?: Match;
 }) {
   const visible = round.filter(ctrl.hasVisibleContent);
   const thisComplete = visible.length > 0 && visible.every((m) => m.winnerId !== null);
@@ -1345,6 +1385,13 @@ function RoundColumn({
             <MatchCard ctrl={ctrl} match={m} onSwissResult={onSwissResult} />
           </div>
         ))}
+        {third && ctrl.hasVisibleContent(third) && (
+          <div style={{ marginTop: THIRD_PLACE_GAP_UNITS * MATCH_UNIT - MATCH_HEIGHT }}>
+            <Eyebrow text="3rd place" />
+            <div style={{ height: 10 }} />
+            <MatchCard ctrl={ctrl} match={third} onSwissResult={onSwissResult} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1373,6 +1420,7 @@ function BracketGroup({
 }: { ctrl: TournamentController; group: number; onSwissResult: (m: Match) => void }) {
   const { p } = useUi();
   const rounds = ctrl.matchesForGroup(group);
+  const third = ctrl.thirdPlaceMatch(group);
   return (
     <div
       style={{
@@ -1388,7 +1436,10 @@ function BracketGroup({
         <div style={{ display: "flex", alignItems: "flex-start" }}>
           {rounds.map((round, index) => (
             <div key={index} style={{ marginRight: index === rounds.length - 1 ? 0 : 36 }}>
-              <RoundColumn ctrl={ctrl} round={round} roundIndex={index} allRounds={rounds} onSwissResult={onSwissResult} />
+              <RoundColumn
+                ctrl={ctrl} round={round} roundIndex={index} allRounds={rounds} onSwissResult={onSwissResult}
+                third={index === rounds.length - 1 ? third : undefined}
+              />
             </div>
           ))}
         </div>
