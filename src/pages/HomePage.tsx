@@ -151,6 +151,7 @@ export default function HomeScreen() {
     fontWeight: weight,
     letterSpacing: 2,
     margin: 0,
+    paddingTop: 4
   });
 
   const heading: CSSProperties = {
@@ -211,17 +212,17 @@ export default function HomeScreen() {
 
   const nameBlock = (
     <div style={{ display: "flex", flexDirection: "column", alignItems: align, textAlign, paddingTop: AppSpacing.sm, minWidth: 0, }}>
-      <h1 style={{ ...headerText(stacked ? 20 : 22, 900), letterSpacing: 2.5, paddingBottom: AppSpacing.xs }}>Emmanuel Despi</h1>
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", justifyContent: stacked ? "center" : "flex-start" }}>
-        <span style={headerText(stacked ? 16 : 20, 500)}>BSCPE</span>
-        <span style={{...headerText(18, 500), paddingLeft: 12}}>  @ Far Eastern University</span>
-        <span style={headerText(16, 500)}>  Institute of Technology</span>
+      <h1 style={{ ...headerText(stacked ? 24 : 28, 900), letterSpacing: 2.5, }}>Emmanuel Despi</h1>
+      <span style={headerText(stacked ? 16 : 20, 500)}>Bachelor of Science in Computer Engineering</span>
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: AppSpacing.xs, justifyContent: stacked ? "center" : "flex-start", alignItems: "center" }}>
+        <span style={{...headerText(18, 500)}}>Far Eastern University</span>
+        <span style={{...headerText(18, 500)}}>Institute of Technology</span>
       </div>
-      <div style={{...headerText(stacked ? 14 : 16, 500), display: "flex", flexDirection: "column", flexWrap: "nowrap"}}>
+      {/* <div style={{...headerText(stacked ? 14 : 16, 500), display: "flex", flexDirection: "column", flexWrap: "nowrap", paddingTop: AppSpacing.xs}}>
         <span style={headerText(16, 500)}>• Software Engineer</span>
         <span style={headerText(16, 500)}>• Full Stack Developer</span>
         <span style={headerText(16, 500)}>• Technical Consultant</span>
-      </div>
+      </div> */}
 
       <div
         style={{
@@ -258,12 +259,12 @@ export default function HomeScreen() {
     </div>
   );
 
-  const contactStyle = headerText(stacked ? 14 : 16, 400);
+  const contactStyle = headerText(stacked ? 16 : 18, 400);
   const contactBlock = (
     <div style={{ display: "flex", flexDirection: "column", alignItems: align, textAlign, paddingTop: AppSpacing.sm }}>
       <div style={contactStyle}>Las Pinas City</div>
       <div style={contactStyle}>emmanuelrobisodespi@gmail.com</div>
-      <div style={contactStyle}>09056248875</div>
+      <div style={contactStyle}><a href={`tel:${+639056248875}`}> +639056248875</a></div>
     </div>
   );
 
