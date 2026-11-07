@@ -1,73 +1,74 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import {
-  NeoAvatar,
-  NeoChip,
+  // NeoAvatar,
+  // NeoChip,
   NeoSwitch,
-  WireFrame,
+  // WireFrame,
   WireFrameFrosted,
 } from "../theme/AppTheme";
 import { AppColors, AppPalette, AppSpacing } from "../theme/tokens";
 import { useResponsive } from "../theme/responsive";
 import { useAppTheme } from "../theme/useAppTheme";
 import { dotBackground } from "../theme/background";
+import { AboutSection } from "./AboutAssets/AboutSection";
 
 // ==========================================
 // DATA
 // ==========================================
 
-const experiences = [
-  { initials: "K", title: "Senior Software Engineer (Full Stack)", company: "Kivo Motion  •  May 2025 – April 2026" },
-  { initials: "D", title: "Robotics Software Engineer", company: "Dyson  •  Dec 2023 – April 2025" },
-  { initials: "T", title: "Embedded Software Engineer", company: "Thales  •  July 2022 – Nov 2023" },
-  { initials: "T", title: "Full Stack Developer", company: "Tesda  •  Sept 2021 – June 2022" },
-  { initials: "F", title: "CIE Operator", company: "FactSet  •  July 2020 – March 2021" },
-  { initials: "N", title: "Intern Software Engineer", company: "Nokia  •  Dec 2019 – March 2020" },
-  { initials: "F", title: "Freelance Software Developer", company: "Self-employed  •  Dec 2019 – Present" },
-];
+// const experiences = [
+//   { initials: "K", title: "Senior Software Engineer (Full Stack)", company: "Kivo Motion  •  May 2025 – April 2026" },
+//   { initials: "D", title: "Robotics Software Engineer", company: "Dyson  •  Dec 2023 – April 2025" },
+//   { initials: "T", title: "Embedded Software Engineer", company: "Thales  •  July 2022 – Nov 2023" },
+//   { initials: "T", title: "Full Stack Developer", company: "Tesda  •  Sept 2021 – June 2022" },
+//   { initials: "F", title: "CIE Operator", company: "FactSet  •  July 2020 – March 2021" },
+//   { initials: "N", title: "Intern Software Engineer", company: "Nokia  •  Dec 2019 – March 2020" },
+//   { initials: "F", title: "Freelance Software Developer", company: "Self-employed  •  Dec 2019 – Present" },
+// ];
 
-const frontEndTechs = [
-  "Flutter", "HTML", "CSS", "React.js", "React Native",
-  "SwiftUI", "Vite", "Tailwind CSS", "Material UI",
-];
+// const frontEndTechs = [
+//   "Flutter", "HTML", "CSS", "React.js", "React Native",
+//   "SwiftUI", "Vite", "Tailwind CSS", "Material UI",
+// ];
 
-const projects = [
-  {
-    title: "Point of Sale",
-    subtitle: "Retail sales and inventory",
-    description: "A point-of-sale experience for managing products, inventory, sales, reports, and store settings.",
-    path: "/pos",
-    image: "/screenshots/pos.png",
-  },
-  {
-    title: "Healthcare",
-    subtitle: "Healthcare profile dashboard",
-    description: "A healthcare-themed dashboard presenting member details and policy information.",
-    path: "/healthcare",
-    image: "/screenshots/healthcare.png",
-  },
-  {
-    title: "Shadow Catalog",
-    subtitle: "Searchable character catalog",
-    description: "Browse and filter a shadow collection with detailed profiles, stats, and grid or list views.",
-    path: "/data",
-    image: "/screenshots/catalog.png",
-  },
-];
+// const projects = [
+//   {
+//     title: "Point of Sale",
+//     subtitle: "Retail sales and inventory",
+//     description: "A point-of-sale experience for managing products, inventory, sales, reports, and store settings.",
+//     path: "/pos",
+//     image: "/screenshots/pos.png",
+//   },
+//   {
+//     title: "Healthcare",
+//     subtitle: "Healthcare profile dashboard",
+//     description: "A healthcare-themed dashboard presenting member details and policy information.",
+//     path: "/healthcare",
+//     image: "/screenshots/healthcare.png",
+//   },
+//   {
+//     title: "Shadow Catalog",
+//     subtitle: "Searchable character catalog",
+//     description: "Browse and filter a shadow collection with detailed profiles, stats, and grid or list views.",
+//     path: "/data",
+//     image: "/screenshots/catalog.png",
+//   },
+// ];
 
-const backEndTechs = [
-  "Node.js", "Next.js", "Redis", "Firebase", "REST API", "Python", "MySQL", "MongoDB", "Git",
-  "Docker", "Kubernetes", "Data Pipelines (ETL/ELT)", "Azure",
-];
+// const backEndTechs = [
+//   "Node.js", "Next.js", "Redis", "Firebase", "REST API", "Python", "MySQL", "MongoDB", "Git",
+//   "Docker", "Kubernetes", "Data Pipelines (ETL/ELT)", "Azure",
+// ];
 
-const cloudTools = [
-  "AWS Cloud Services", "Github", "VS Code", "Postman", "Figma",
-  "Jira", "Kafka", "Kanban", "Google API", "Vercel",
-];
+// const cloudTools = [
+//   "AWS Cloud Services", "Github", "VS Code", "Postman", "Figma",
+//   "Jira", "Kafka", "Kanban", "Google API", "Vercel",
+// ];
 
-const languages = [
-  "C", "C++", "C#", "Go Lang", "JavaScript", "TypeScript", "Python", "Java", "Dart", "Swift", "Kotlin",
-];
+// const languages = [
+//   "C", "C++", "C#", "Go Lang", "JavaScript", "TypeScript", "Python", "Java", "Dart", "Swift", "Kotlin",
+// ];
 
 // ==========================================
 // SMALL PIECES
@@ -135,12 +136,12 @@ export default function HomeScreen() {
 
   const responsive = useResponsive();
   const dashboardWidth = responsive.width * ((responsive.isDesktop &&responsive.width < 1850) ? 0.8 : responsive.isDesktop ? 0.6 : responsive.isMobile ? 0.95 : 0.95);
-  const { isMobile, isTablet, isDesktop } = responsive;
+  const { isMobile } = responsive;
   const p = isDark ? AppPalette.dark : AppPalette.light;
 
   const ink = isDark ? AppColors.oatmilk : p.ink;
   const stacked = isMobile;;
-  const expWidth = dashboardWidth * (isMobile ? 0.96 : isDesktop ? 0.45 : isTablet ? 0.45 : 0.45);
+  // const expWidth = dashboardWidth * (isMobile ? 0.96 : isDesktop ? 0.45 : isTablet ? 0.45 : 0.45);
 
   
 
@@ -154,23 +155,23 @@ export default function HomeScreen() {
     paddingTop: 4
   });
 
-  const heading: CSSProperties = {
-    color: ink,
-    fontSize: isMobile ? 16 : 20,
-    fontWeight: 900,
-    letterSpacing: 2.5,
-    margin: 0,
-  };
+  // const heading: CSSProperties = {
+  //   color: ink,
+  //   fontSize: isMobile ? 16 : 20,
+  //   fontWeight: 900,
+  //   letterSpacing: 2.5,
+  //   margin: 0,
+  // };
 
-  const subheading: CSSProperties = {
-    color: ink,
-    fontSize: 14,
-    fontWeight: 800,
-    letterSpacing: 2.5,
-    margin: 0,
-  };
+  // const subheading: CSSProperties = {
+  //   color: ink,
+  //   fontSize: 14,
+  //   fontWeight: 800,
+  //   letterSpacing: 2.5,
+  //   margin: 0,
+  // };
 
-  const rule = <hr style={{ border: "none", borderTop: `2px solid ${ink}`, margin: 0 }} />;
+  // const rule = <hr style={{ border: "none", borderTop: `2px solid ${ink}`, margin: 0 }} />;
 
   // ---------- header ----------
   const avatarSize = responsive.isMobile
@@ -298,113 +299,113 @@ export default function HomeScreen() {
     </div>
   );
 
-  // ---------- tech stack ----------
-  const techGroup = (label: string, items: string[]) => (
-    <div>
-      <h3 style={subheading}>{label}</h3>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: AppSpacing.sm, marginTop: AppSpacing.sm }}>
-        {items.map((t) => (
-          <NeoChip key={t} label={t} isDark={isDark} />
-        ))}
-      </div>
-    </div>
-  );
+  // // ---------- tech stack ----------
+  // const techGroup = (label: string, items: string[]) => (
+  //   <div>
+  //     <h3 style={subheading}>{label}</h3>
+  //     <div style={{ display: "flex", flexWrap: "wrap", gap: AppSpacing.sm, marginTop: AppSpacing.sm }}>
+  //       {items.map((t) => (
+  //         <NeoChip key={t} label={t} isDark={isDark} />
+  //       ))}
+  //     </div>
+  //   </div>
+  // );
 
-  const groupDivider = <div style={{ padding: `${AppSpacing.sm}px 0` }}>{rule}</div>;
+  // const groupDivider = <div style={{ padding: `${AppSpacing.sm}px 0` }}>{rule}</div>;
 
-  const techStackPanel = (
-    <div>
-      <h2 style={heading}>Tech Stack & Skills</h2>
-      <div style={{ height: AppSpacing.sm }} />
-      {techGroup("Front End", frontEndTechs)}
-      {groupDivider}
-      {techGroup("Back End", backEndTechs)}
-      {groupDivider}
-      {techGroup("Cloud and Tools", cloudTools)}
-      {groupDivider}
-      {techGroup("Languages", languages)}
-    </div>
-  );
+  // const techStackPanel = (
+  //   <div>
+  //     <h2 style={heading}>Tech Stack & Skills</h2>
+  //     <div style={{ height: AppSpacing.sm }} />
+  //     {techGroup("Front End", frontEndTechs)}
+  //     {groupDivider}
+  //     {techGroup("Back End", backEndTechs)}
+  //     {groupDivider}
+  //     {techGroup("Cloud and Tools", cloudTools)}
+  //     {groupDivider}
+  //     {techGroup("Languages", languages)}
+  //   </div>
+  // );
 
-  // ---------- projects ------------
-  const projectPanel = (
-    <div style={{ display: "flex", flexDirection: "column", gap: AppSpacing.sm }}>
-      {projects.map((project) => (
-        <button
-          key={project.path}
-          type="button"
-          onClick={() => navigate(project.path)}
-          aria-label={`Open ${project.title}: ${project.description}`}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: AppSpacing.md,
-            width: "100%",
-            padding: AppSpacing.sm,
-            border: `2px solid ${ink}`,
-            borderRadius: 8,
-            backgroundColor: p.card,
-            color: ink,
-            textAlign: "left",
-            cursor: "pointer",
-          }}
-        >
-          <img
-            src={project.image}
-            alt=""
-            style={{
-              display: "block",
-              width: isMobile ? 100 : 180,
-              aspectRatio: "16 / 9",
-              objectFit: "cover",
-              flexShrink: 0,
-              border: `2px solid ${ink}`,
-              borderRadius: 6,
-            }}
-          />
-          <div style={{ minWidth: 0 }}>
-            <div style={{ color: p.ink, fontSize: 13, fontWeight: 700, letterSpacing: 1.5 }}>
-              {project.subtitle}
-            </div>
-            <h3 style={{ color: ink, fontSize: 18, fontWeight: 900, letterSpacing: 1.5, margin: "4px 0" }}>
-              {project.title}
-            </h3>
-            <p style={{ color: p.ink, fontSize: 14, lineHeight: 1.5, margin: 0 }}>
-              {project.description}
-            </p>
-          </div>
-        </button>
-      ))}
-    </div>
-  );
-  // ---------- experience ----------
-  const experiencePanel = (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-      }} 
-    > 
-      <h2 style={heading}>Work Experience</h2>
-      <div style={{ height: 22 }} />
-      {experiences.map((exp, i) => (
-        <div key={i}>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: AppSpacing.sm }}>
-            <NeoAvatar initials={exp.initials} isDark={isDark} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ color: ink, fontSize: 16, fontWeight: 800, letterSpacing: 1.5 }}>{exp.title}</div>
-              <div style={{ color: ink, fontSize: 14, fontWeight: 400, letterSpacing: 1.5, marginTop: 4 }}>
-                {exp.company}
-              </div>
-            </div>
-          </div>
-          <div style={{ padding: `${AppSpacing.sm}px 0` }}>{rule}</div>
-        </div>
-      ))}
-    </div>
-  );
+  // // ---------- projects ------------
+  // const projectPanel = (
+  //   <div style={{ display: "flex", flexDirection: "column", gap: AppSpacing.sm }}>
+  //     {projects.map((project) => (
+  //       <button
+  //         key={project.path}
+  //         type="button"
+  //         onClick={() => navigate(project.path)}
+  //         aria-label={`Open ${project.title}: ${project.description}`}
+  //         style={{
+  //           display: "flex",
+  //           alignItems: "center",
+  //           gap: AppSpacing.md,
+  //           width: "100%",
+  //           padding: AppSpacing.sm,
+  //           border: `2px solid ${ink}`,
+  //           borderRadius: 8,
+  //           backgroundColor: p.card,
+  //           color: ink,
+  //           textAlign: "left",
+  //           cursor: "pointer",
+  //         }}
+  //       >
+  //         <img
+  //           src={project.image}
+  //           alt=""
+  //           style={{
+  //             display: "block",
+  //             width: isMobile ? 100 : 180,
+  //             aspectRatio: "16 / 9",
+  //             objectFit: "cover",
+  //             flexShrink: 0,
+  //             border: `2px solid ${ink}`,
+  //             borderRadius: 6,
+  //           }}
+  //         />
+  //         <div style={{ minWidth: 0 }}>
+  //           <div style={{ color: p.ink, fontSize: 13, fontWeight: 700, letterSpacing: 1.5 }}>
+  //             {project.subtitle}
+  //           </div>
+  //           <h3 style={{ color: ink, fontSize: 18, fontWeight: 900, letterSpacing: 1.5, margin: "4px 0" }}>
+  //             {project.title}
+  //           </h3>
+  //           <p style={{ color: p.ink, fontSize: 14, lineHeight: 1.5, margin: 0 }}>
+  //             {project.description}
+  //           </p>
+  //         </div>
+  //       </button>
+  //     ))}
+  //   </div>
+  // );
+  // // ---------- experience ----------
+  // const experiencePanel = (
+  //   <div
+  //     style={{
+  //       display: "flex",
+  //       flexDirection: "column",
+  //     }} 
+  //   > 
+  //     <h2 style={heading}>Work Experience</h2>
+  //     <div style={{ height: 22 }} />
+  //     {experiences.map((exp, i) => (
+  //       <div key={i}>
+  //         <div style={{ display: "flex", alignItems: "flex-start", gap: AppSpacing.sm }}>
+  //           <NeoAvatar initials={exp.initials} isDark={isDark} />
+  //           <div style={{ flex: 1, minWidth: 0 }}>
+  //             <div style={{ color: ink, fontSize: 16, fontWeight: 800, letterSpacing: 1.5 }}>{exp.title}</div>
+  //             <div style={{ color: ink, fontSize: 14, fontWeight: 400, letterSpacing: 1.5, marginTop: 4 }}>
+  //               {exp.company}
+  //             </div>
+  //           </div>
+  //         </div>
+  //         <div style={{ padding: `${AppSpacing.sm}px 0` }}>{rule}</div>
+  //       </div>
+  //     ))}
+  //   </div>
+  // );
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // ---------- dashboard ----------
   return (
@@ -427,8 +428,9 @@ export default function HomeScreen() {
         {header}
         <div style={{ height: 24 }} />
         {sectionDivider("About")}
+        <AboutSection isDark={isDark} isMobile={isMobile} />
 
-        <div
+        {/* <div
           style={{
             display: "flex",
             flexDirection: isMobile ? "column" : "row",
@@ -479,7 +481,7 @@ export default function HomeScreen() {
           )}
         </div>
         {sectionDivider("Projects")}
-        {projectPanel}
+        {projectPanel} */}
       </WireFrameFrosted>
     </div>
   );
